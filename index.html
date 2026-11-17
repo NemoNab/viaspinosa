@@ -13,10 +13,6 @@
   #preloader { position: fixed; inset: 0; z-index: 10; background: #00030a; transition: opacity .6s ease; }
   #preloader canvas { display: block; width: 100%; height: 100%; }
   #preloader.done { opacity: 0; pointer-events: none; }
-  #tune { position: fixed; right: 12px; bottom: 12px; z-index: 20; font-size: 12px; color: #e9e6df99; background: #00030acc; padding: 8px 10px; border: 1px solid #e9e6df22; border-radius: 8px; display: grid; grid-template-columns: auto 110px 34px; gap: 4px 8px; align-items: center; }
-  #tune input { width: 110px; }
-  #tune output { text-align: right; color: #e9e6df; }
-  #tune button { grid-column: 1 / -1; margin-top: 4px; background: none; color: #e9e6df; border: 1px solid #e9e6df55; border-radius: 6px; padding: 5px; cursor: pointer; font: inherit; }
   .corner { position: fixed; z-index: 15; font: 400 11px/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #8b8880; }
   .corner b { font-weight: 400; color: #e9e6df; }
   .corner a { color: inherit; text-decoration: none; } .corner a:hover { color: #e9e6df; }
@@ -31,15 +27,6 @@
 <div class="corner" style="right:20px;bottom:20px"><a href="https://t.me/strangejell_stuff">strangejell ↗</a></div>
 <div id="preloader"><canvas id="c"></canvas></div>
 
-<!-- Панель для подбора параметров, на сайте её не будет -->
-<div id="tune">
-  <label for="t-px">зерно</label><input id="t-px" type="range" min="1" max="5" step="1" value="2">
-  <label for="t-con">контраст</label><input id="t-con" type="range" min="0.6" max="2.4" step="0.05" value="1.2">
-  <label for="t-lump">рельеф</label><input id="t-lump" type="range" min="0" max="2" step="0.05" value="1.75">
-  <label for="t-spd">скорость</label><input id="t-spd" type="range" min="0" max="3" step="0.05" value="0.55">
-  <label for="t-tilt">наклон</label><input id="t-tilt" type="range" min="-0.8" max="0.8" step="0.02" value="-0.34">
-  <button id="t-copy">Скопировать настройки</button>
-</div>
 
 <script type="importmap">
 { "imports": { "three": "./vendor/three.module.min.js" } }
@@ -51,9 +38,7 @@ import * as THREE from "three";
 const BG = new THREE.Color(0x00030a);
 const FG = new THREE.Color(0xf2f0ea);
 const P = { px: 2, contrast: 1.2, lump: 1.75, speed: 0.55, tilt: -0.34 };
-// режим настройки: viaspinosa.art/...?tune — панель с ползунками и бесконечный показ
-const LOOP = true; const TUNE = new URLSearchParams(location.search).has("tune");
-if (!TUNE) document.getElementById("tune").remove();
+const LOOP = true;
 const MIN_SHOW = 2600;          // минимум показа, мс
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -200,25 +185,6 @@ if (document.getElementById("replay")) document.getElementById("replay").onclick
   requestAnimationFrame(frame); if (!LOOP) setTimeout(startExit, MIN_SHOW);
 };
 
-/* ---------- панель настройки (только с ?tune) ---------- */
-if (TUNE) {
-const bind = (id, key, fn) => {
-  const el = document.getElementById(id), out = document.createElement("output");
-  el.after(out); const show = () => out.textContent = (+el.value).toFixed(2).replace(/\.?0+$/, "");
-  show(); el.addEventListener("input", () => { P[key] = +el.value; show(); fn && fn(); });
-};
-bind("t-px", "px", () => post.uniforms.px.value = P.px);
-bind("t-con", "contrast", () => post.uniforms.contrast.value = P.contrast);
-bind("t-spd", "speed");
-bind("t-tilt", "tilt", () => axis.rotation.z = P.tilt);
-document.getElementById("t-copy").onclick = async (e) => {
-  const txt = JSON.stringify(P);
-  try { await navigator.clipboard.writeText(txt); e.target.textContent = "Скопировано"; }
-  catch { prompt("Скопируйте настройки:", txt); }
-  setTimeout(() => e.target.textContent = "Скопировать настройки", 1500);
-};
-bind("t-lump", "lump", () => { ringGeo.userData.apply(P.lump); sunGeo.userData.apply(P.lump); });
-}
 </script>
 </body>
 </html>
