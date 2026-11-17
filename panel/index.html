@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>пульт · viaspinosa.art</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  @font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url(/assets/fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-2199; }
+  @font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url(/assets/fonts/jetbrains-mono-cyrillic-400-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+  @font-face { font-family: "JetBrains Mono"; font-weight: 500; src: url(/assets/fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-2199; }
+  @font-face { font-family: "JetBrains Mono"; font-weight: 500; src: url(/assets/fonts/jetbrains-mono-cyrillic-500-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+  @font-face { font-family: "Onest"; font-weight: 400; src: url(/assets/fonts/onest-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+  @font-face { font-family: "Onest"; font-weight: 400; src: url(/assets/fonts/onest-cyrillic-400-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+  :root { --bg: #00030a; --ink: #e9e6df; --mute: #8b8880; --line: rgba(233,230,223,.14); --field: #0b0e16; --ok: #8fd18f; --err: #e88a7d;
+          --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 20px 120px; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+  h1 { margin: 0; font: 500 32px/1 var(--mono); letter-spacing: -.04em; }
+  .mono, label span, .hint, th, button, .bar { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .hint { color: var(--mute); text-transform: none; letter-spacing: 0; font-size: 12px; }
+  header a { color: var(--mute); }
+  section { border-bottom: 1px solid var(--line); padding: 28px 0; }
+  h2 { margin: 0 0 18px; font: 500 20px/1.2 var(--mono); letter-spacing: -.03em; text-transform: lowercase; }
+  label { display: flex; flex-direction: column; gap: 6px; }
+  label span { color: var(--mute); }
+  input[type=text], input[type=url], input[type=password], textarea, select {
+    background: var(--field); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; font: 15px/1.4 var(--sans); width: 100%; }
+  textarea { min-height: 84px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: 1px solid var(--ink); outline-offset: 0; }
+  .row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .check { flex-direction: row; align-items: center; gap: 8px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; color: var(--mute); font-weight: 400; padding: 0 8px 10px 0; }
+  td { padding: 8px 8px 8px 0; border-top: 1px solid var(--line); vertical-align: middle; }
+  td input[type=text] { min-width: 90px; }
+  input[type=color] { width: 40px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; cursor: pointer; }
+  input[type=range] { width: 110px; }
+  .sw { width: 56px; height: 56px; border-radius: 6px; position: relative; overflow: hidden; display: block; }
+  .sw i { position: absolute; inset: 14px; border-radius: 50%; }
+  .sw b { position: absolute; inset: 0; background: url(/assets/grain.png); }
+  button { cursor: pointer; background: none; color: var(--ink); border: 1px solid var(--line); border-radius: 99px; padding: 9px 14px; }
+  button:hover { border-color: var(--ink); }
+  button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  button:disabled { opacity: .5; cursor: wait; }
+  .del { border: 0; padding: 4px 6px; color: var(--mute); }
+  .save { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(0,3,10,.94); border-top: 1px solid var(--line); }
+  .save .wrap { padding: 14px 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .save input { width: 200px; }
+  #msg { font: 400 12px/1.4 var(--mono); }
+  #msg.ok { color: var(--ok); } #msg.err { color: var(--err); }
+  a { color: var(--ink); }
+  @media (max-width: 760px) {
+    .grid2 { grid-template-columns: 1fr; }
+    table, tbody, tr, td { display: block; width: 100%; } thead { display: none; }
+    tr { border-top: 1px solid var(--line); padding: 10px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    td { border: 0; padding: 0; width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>пульт</h1>
+    <span class="hint">viaspinosa.art · изменения появляются на&nbsp;сайте примерно через минуту после сохранения · <a href="/" target="_blank">открыть сайт ↗</a></span>
+  </header>
+
+  <section>
+    <h2>Статус</h2>
+    <div class="row">
+      <label class="check"><input type="checkbox" id="st-on"><span>показывать</span></label>
+      <label style="flex:1;min-width:220px"><span>текст</span><input type="text" id="st-text" placeholder="беру проекты"></label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Палитры</h2>
+    <p class="hint">Первый экран берёт случайную включённую палитру. Половина Сергея берёт палитры Сергея, половина Лизы — палитры Лизы. Зерно: 0 — нет, 0,3 — как было изначально.</p>
+    <table>
+      <thead><tr><th></th><th>название</th><th>чья</th><th>фон</th><th>цвет</th><th>зерно</th><th>вкл</th><th></th></tr></thead>
+      <tbody id="pal"></tbody>
+    </table>
+    <div class="row" style="margin-top:14px"><button type="button" id="add-pal">+ палитра</button></div>
+  </section>
+
+  <section>
+    <h2>Развилка</h2>
+    <div class="grid2">
+      <div class="stack" data-person="n"><div class="mono">Сергей</div></div>
+      <div class="stack" data-person="l"><div class="mono">Лиза</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Подключение</h2>
+    <label><span>адрес Apps Script (web app)</span><input type="url" id="endpoint" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <p class="hint">Задаётся один раз. Адрес сохраняется вместе с настройками.</p>
+  </section>
+</div>
+
+<div class="save"><div class="wrap">
+  <input type="password" id="pw" placeholder="пароль пульта" autocomplete="current-password">
+  <button type="button" class="primary" id="save">Сохранить</button>
+  <button type="button" id="reset">Отменить правки</button>
+  <span id="msg"></span>
+</div></div>
+
+<script>
+(function () {
+  var FIELDS = [["name","имя","text"],["city","город","text"],["desc","описание","area"],["tags","направления","text"],["write","ссылка «написать»","url"],["channel","ссылка «канал»","url"]];
+  var cfg;
+  var $ = function (id) { return document.getElementById(id); };
+  function msg(t, cls) { $("msg").textContent = t; $("msg").className = cls || ""; }
+
+  function load() {
+    var s = document.createElement("script");
+    s.src = "/config.js?t=" + Date.now();
+    s.onload = function () { cfg = JSON.parse(JSON.stringify(window.SITE)); render(); };
+    s.onerror = function () { msg("не удалось загрузить config.js", "err"); };
+    document.head.appendChild(s);
+  }
+
+  function swatch(p) { return '<span class="sw" style="background:' + p.bg + '"><i style="background:' + p.fg + '"></i><b style="opacity:' + p.grain + '"></b></span>'; }
+
+  function render() {
+    $("st-on").checked = !!(cfg.status && cfg.status.on);
+    $("st-text").value = (cfg.status && cfg.status.text) || "";
+    $("endpoint").value = (cfg.panel && cfg.panel.endpoint) || "";
+    var tb = $("pal"); tb.textContent = "";
+    cfg.palettes.forEach(function (p, i) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="swc"></td>' +
+        '<td><input type="text" data-f="name"></td>' +
+        '<td><select data-f="by"><option value="n">Сергей</option><option value="l">Лиза</option></select></td>' +
+        '<td><input type="color" data-f="bg"></td>' +
+        '<td><input type="color" data-f="fg"></td>' +
+        '<td><div class="row" style="gap:8px"><input type="range" min="0" max="0.5" step="0.01" data-f="grain"><span class="mono gv"></span></div></td>' +
+        '<td><input type="checkbox" data-f="on"></td>' +
+        '<td><a class="mono" target="_blank" href="/?p=' + i + '" title="Сохранённая версия">смотреть ↗</a> <button type="button" class="del" title="Удалить палитру">✕</button></td>';
+      tr.querySelector("[data-f=name]").value = p.name;
+      tr.querySelector("[data-f=by]").value = p.by;
+      tr.querySelector("[data-f=bg]").value = p.bg;
+      tr.querySelector("[data-f=fg]").value = p.fg;
+      tr.querySelector("[data-f=grain]").value = p.grain;
+      tr.querySelector("[data-f=on]").checked = p.on !== false;
+      function upd() {
+        p.name = tr.querySelector("[data-f=name]").value.trim();
+        p.by = tr.querySelector("[data-f=by]").value;
+        p.bg = tr.querySelector("[data-f=bg]").value;
+        p.fg = tr.querySelector("[data-f=fg]").value;
+        p.grain = Math.round(parseFloat(tr.querySelector("[data-f=grain]").value) * 100) / 100;
+        p.on = tr.querySelector("[data-f=on]").checked;
+        tr.querySelector(".swc").innerHTML = swatch(p);
+        tr.querySelector(".gv").textContent = p.grain.toFixed(2);
+      }
+      tr.addEventListener("input", upd); upd();
+      tr.querySelector(".del").onclick = function () { if (cfg.palettes.length > 1 && confirm("Удалить палитру «" + p.name + "»?")) { cfg.palettes.splice(i, 1); render(); } };
+      tb.appendChild(tr);
+    });
+    ["n","l"].forEach(function (k) {
+      var box = document.querySelector('[data-person="' + k + '"]');
+      box.querySelectorAll("label").forEach(function (l) { l.remove(); });
+      FIELDS.forEach(function (f) {
+        var l = document.createElement("label"), span = document.createElement("span"), inp = document.createElement(f[2] === "area" ? "textarea" : "input");
+        span.textContent = f[1]; if (f[2] !== "area") inp.type = f[2] === "url" ? "url" : "text";
+        inp.value = cfg.people[k][f[0]] || "";
+        inp.addEventListener("input", function () { cfg.people[k][f[0]] = inp.value; });
+        l.appendChild(span); l.appendChild(inp); box.appendChild(l);
+      });
+    });
+  }
+
+  $("st-on").onchange = function () { cfg.status.on = this.checked; };
+  $("st-text").oninput = function () { cfg.status.text = this.value; };
+  $("endpoint").oninput = function () { cfg.panel = cfg.panel || {}; cfg.panel.endpoint = this.value.trim(); };
+  $("add-pal").onclick = function () { cfg.palettes.push({ name: "новая", by: "n", bg: "#00030a", fg: "#f2f0ea", grain: 0.2, on: false }); render(); };
+  $("reset").onclick = function () { cfg = JSON.parse(JSON.stringify(window.SITE)); render(); msg("правки отменены"); };
+
+  function check() {
+    var bad = [];
+    cfg.palettes.forEach(function (p) { if (!p.name) bad.push("у палитры нет названия"); });
+    if (!cfg.palettes.some(function (p) { return p.on !== false; })) bad.push("включите хотя бы одну палитру");
+    ["n","l"].forEach(function (k) { ["write","channel"].forEach(function (f) { var v = cfg.people[k][f]; if (v && !/^(https?:|mailto:|tg:)/i.test(v)) bad.push("ссылка должна начинаться с https://: " + v); }); });
+    return bad;
+  }
+
+  $("save").onclick = function () {
+    var bad = check(); if (bad.length) { msg(bad[0], "err"); return; }
+    var url = cfg.panel && cfg.panel.endpoint; if (!url) { msg("укажите адрес Apps Script внизу страницы", "err"); return; }
+    if (!$("pw").value) { msg("введите пароль", "err"); return; }
+    cfg.updated = new Date().toISOString();
+    $("save").disabled = true; msg("сохраняю…");
+    fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ password: $("pw").value, config: cfg }) })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (r.ok) { window.SITE = JSON.parse(JSON.stringify(cfg)); msg("сохранено, сайт обновится примерно через минуту", "ok"); }
+        else msg(r.error || "не получилось сохранить", "err");
+      })
+      .catch(function (e) { msg("нет связи с Apps Script: " + e.message, "err"); })
+      .finally(function () { $("save").disabled = false; });
+  };
+
+  load();
+})();
+</script>
+</body>
+</html>

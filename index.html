@@ -20,17 +20,19 @@
 <meta property="og:image:alt" content="Зернистое кольцо вокруг шара на чёрном фоне">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="modulepreload" href="/assets/sun.min.js">
+<script src="/config.js"></script>
 <script>
-/* Палитры из работ: n — Наб (канал «незаметные слова»), l — Лиза («лиза живет»).
-   Первый экран: случайная палитра, не повторяя прошлую. Развилка: левая половина в палитре Наба,
-   правая — в палитре Лизы; палитра первого экрана остаётся у своего автора. ?p=номер — конкретная. */
-window.PALETTES = [
+/* Палитры и тексты берутся из /config.js (его правит пульт /panel). Ниже — запасные значения,
+   если config.js не загрузился. n — Наб, l — Лиза. Первый экран: случайная включённая палитра,
+   не повторяя прошлую; половины развилки — палитры своих авторов. ?p=номер — конкретная палитра. */
+window.PALETTES = ((window.SITE && window.SITE.palettes) || [
   { name: "ночь",    by: "n", bg: "#00030a", fg: "#f2f0ea", grain: .3 },
   { name: "бирюза",  by: "n", bg: "#121014", fg: "#57d3e6", grain: .15 },
   { name: "красный", by: "n", bg: "#e5e4de", fg: "#b83f45", grain: .3 },
   { name: "охра",    by: "l", bg: "#151513", fg: "#dcac74", grain: .15 },
   { name: "хвоя",    by: "l", bg: "#dedbd2", fg: "#1e5855", grain: .15 }
-];
+]).filter(function (p) { return p.on !== false; });
+if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg: "#00030a", fg: "#f2f0ea", grain: .3 }];
 (function () {
   var P = window.PALETTES, i, last = null, q = new URLSearchParams(location.search).get("p");
   try { last = sessionStorage.getItem("vs-pal"); } catch (e) {}
@@ -38,7 +40,7 @@ window.PALETTES = [
   else { do { i = Math.floor(Math.random() * P.length); } while (P.length > 1 && String(i) === last); }
   try { sessionStorage.setItem("vs-pal", String(i)); } catch (e) {}
   var intro = P[i];
-  function pick(by) { if (intro.by === by) return intro; var o = P.filter(function (p) { return p.by === by; }); return o[Math.floor(Math.random() * o.length)]; }
+  function pick(by) { if (intro.by === by) return intro; var o = P.filter(function (p) { return p.by === by; }); if (!o.length) o = P; return o[Math.floor(Math.random() * o.length)]; }
   function lum(hex) { var h = hex.slice(1); return (parseInt(h.slice(0,2),16)*.299 + parseInt(h.slice(2,4),16)*.587 + parseInt(h.slice(4,6),16)*.114) / 255; }
   function light(hex) { return lum(hex) > .5; }
   var r = document.documentElement.style;
@@ -144,16 +146,16 @@ window.PALETTES = [
 
 <main id="home" aria-label="Портфолио">
   <section class="half n grain-surface" aria-labelledby="n-name">
-    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span class="status">● беру проекты</span></div>
+    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span class="status" data-k="status">● беру проекты</span></div>
     <div class="who">
       <div class="head">
         <canvas class="ava" data-side="n" width="336" height="336" aria-hidden="true"></canvas>
-        <h2 class="name" id="n-name"><a href="https://t.me/nemonab">Сергей Потапов</a></h2>
+        <h2 class="name" id="n-name"><a data-k="n.name" data-href="n.write" href="https://t.me/nemonab">Сергей Потапов</a></h2>
       </div>
-      <div class="real">Екатеринбург → Алматы</div>
-      <p class="desc">Пиар, картинки и маленькие системы для культурных проектов. Шесть лет в независимом книжном: от торгового зала до PR-директора.</p>
-      <div class="tags">[PR] пиар и партнёрства · [Д] дизайн · [А] автоматизация</div>
-      <div class="links"><a href="https://t.me/nemonab">написать ↗</a><a href="https://t.me/spottedword">канал ↗</a><span>раздел — скоро</span></div>
+      <div class="real" data-k="n.city">Екатеринбург → Алматы</div>
+      <p class="desc" data-k="n.desc">Пиар, картинки и маленькие системы для культурных проектов. Шесть лет в независимом книжном: от торгового зала до PR-директора.</p>
+      <div class="tags" data-k="n.tags">[PR] пиар и партнёрства · [Д] дизайн · [А] автоматизация</div>
+      <div class="links" data-links="n"><a href="https://t.me/nemonab">написать ↗</a><a href="https://t.me/spottedword">канал ↗</a><span>раздел — скоро</span></div>
     </div>
     <div class="foot"><span>nemonab</span><span>/nemonab</span></div>
   </section>
@@ -162,16 +164,41 @@ window.PALETTES = [
     <div class="who">
       <div class="head">
         <canvas class="ava" data-side="l" width="336" height="336" aria-hidden="true"></canvas>
-        <h2 class="name" id="l-name"><a href="https://t.me/strangejell_stuff">Лиза Конышева</a></h2>
+        <h2 class="name" id="l-name"><a data-k="l.name" data-href="l.channel" href="https://t.me/strangejell_stuff">Лиза Конышева</a></h2>
       </div>
-      <div class="real">Екатеринбург → Алматы</div>
-      <p class="desc">2D-аниматор, арт-директор и художница. Рисует, лепит, режет гравюры и оживляет это на экране.</p>
-      <div class="tags">анимация · рисунок · живопись · скульптура · гравюра</div>
-      <div class="links"><a href="https://t.me/strangejell_stuff">канал ↗</a><span>раздел — скоро</span></div>
+      <div class="real" data-k="l.city">Екатеринбург → Алматы</div>
+      <p class="desc" data-k="l.desc">2D-аниматор, арт-директор и художница. Рисует, лепит, режет гравюры и оживляет это на экране.</p>
+      <div class="tags" data-k="l.tags">анимация · рисунок · живопись · скульптура · гравюра</div>
+      <div class="links" data-links="l"><a href="https://t.me/strangejell_stuff">канал ↗</a><span>раздел — скоро</span></div>
     </div>
     <div class="foot"><span>strangejell</span><span>/strangejell</span></div>
   </section>
 </main>
+
+<script>
+/* ---------- тексты, ссылки и статус из config.js ---------- */
+(function () {
+  var S = window.SITE; if (!S) return;
+  var SHORT = /(^|[\s(«])([А-Яа-яЁёA-Za-z]{1,2}|без|для|над|под|при|про|что|как|или|это|все|так) (?=\S)/g;
+  function nb(t) { t = String(t || "").replace(/ (—|–)/g, "\u00a0$1").replace(/\] /g, "]\u00a0"); var p; do { p = t; t = t.replace(SHORT, "$1$2\u00a0"); } while (p !== t); return t; }
+  function safe(u) { return typeof u === "string" && /^(https?:|mailto:|tg:)/i.test(u); }
+  function get(path) { return path.split(".").reduce(function (o, k) { return o && o[k]; }, S.people); }
+  document.querySelectorAll("[data-k]").forEach(function (el) {
+    var k = el.dataset.k;
+    if (k === "status") { el.hidden = !(S.status && S.status.on); el.textContent = "● " + ((S.status && S.status.text) || ""); return; }
+    var v = get(k); if (v != null) el.textContent = nb(v);
+  });
+  document.querySelectorAll("[data-href]").forEach(function (el) { var v = get(el.dataset.href); if (safe(v)) el.href = v; });
+  document.querySelectorAll("[data-links]").forEach(function (box) {
+    var p = S.people[box.dataset.links]; if (!p) return;
+    box.textContent = "";
+    function add(tag, text, href) { var a = document.createElement(tag); a.textContent = text; if (href) a.href = href; box.appendChild(a); }
+    if (safe(p.write)) add("a", "написать ↗", p.write);
+    if (safe(p.channel)) add("a", "канал ↗", p.channel);
+    add("span", "раздел\u00a0— скоро");
+  });
+})();
+</script>
 
 <section id="intro" class="grain-surface" aria-label="viaspinosa.art">
   <canvas id="c" aria-hidden="true"></canvas>
