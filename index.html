@@ -99,6 +99,7 @@ window.PALETTES = [
   .bar a, .bar button { color: var(--m); text-decoration: none; background: none; border: 0; padding: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
   .bar a:hover, .bar button:hover { color: var(--i); }
   .bar b { font-weight: 400; color: var(--i); }
+  .bar .status { color: var(--i); }
   .who { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 56px 0 48px; max-width: 560px; }
   .head { display: flex; flex-direction: column; gap: 20px; }
   .ava { width: 168px; height: 168px; border-radius: 50%; display: block; }
@@ -136,7 +137,7 @@ window.PALETTES = [
 
 <main id="home" aria-label="Портфолио">
   <section class="half n grain-surface" aria-labelledby="n-name">
-    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button></div>
+    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span class="status">● беру проекты</span></div>
     <div class="who">
       <div class="head">
         <canvas class="ava" data-side="n" width="336" height="336" aria-hidden="true"></canvas>
@@ -145,7 +146,7 @@ window.PALETTES = [
       <div class="real">Сергей Потапов · Екатеринбург → Алматы</div>
       <p class="desc">Пиар, картинки и маленькие системы для культурных проектов. Шесть лет в независимом книжном: от торгового зала до PR-директора.</p>
       <div class="tags">[PR] пиар и партнёрства · [Д] дизайн · [А] автоматизация</div>
-      <div class="links"><a href="https://t.me/spottedword">канал ↗</a><span>раздел — скоро</span></div>
+      <div class="links"><a href="https://t.me/nemonab">написать ↗</a><a href="https://t.me/spottedword">канал ↗</a><span>раздел — скоро</span></div>
     </div>
     <div class="foot"><span>nemonab</span><span>/nemonab</span></div>
   </section>
