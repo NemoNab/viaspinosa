@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>viaspinosa.art</title>
 <meta name="description" content="Nab и strangejell: пиар, картинки, анимация и маленькие системы.">
-<meta name="theme-color" content="#00030a">
+<meta name="theme-color" content="#00030a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3eee3" media="(prefers-color-scheme: light)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -17,21 +18,25 @@
 <meta property="og:image" content="https://viaspinosa.art/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Зернистое кольцо вокруг шара на чёрном фоне">
+<meta property="og:image:alt" content="Зернистое кольцо вокруг шара: левая половина ночная, правая дневная">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/assets/grain.css">
 <style>
   html, body { margin: 0; height: 100%; background: #00030a; color: #e9e6df; font: 16px/1.5 system-ui, sans-serif; }
   #page { min-height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
   #page h1 { font: 400 40px/1.1 Georgia, serif; margin: 0; }
   #page button { background: none; color: inherit; border: 1px solid #e9e6df55; border-radius: 99px; padding: 8px 16px; cursor: pointer; font: inherit; }
-  #preloader { position: fixed; inset: 0; z-index: 10; background: #00030a; transition: opacity .6s ease; }
+  #preloader { position: fixed; inset: 0; z-index: 10; transition: opacity .6s ease; }
   #preloader canvas { display: block; width: 100%; height: 100%; }
   #preloader.done { opacity: 0; pointer-events: none; }
   .corner { position: fixed; z-index: 15; font: 400 11px/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #8b8880; }
   .corner b { font-weight: 400; color: #e9e6df; }
+  .corner.day { color: #6f6a5f; } .corner.day b, .corner.day a:hover { color: #1c1a16; }
+  body { background: linear-gradient(90deg, #00030a 35%, #f3eee3 65%); }
+  @media (max-aspect-ratio: 1/1) { body { background: linear-gradient(180deg, #00030a 35%, #f3eee3 65%); } .corner.day.top { color: #8b8880; } .corner.day.top b { color: #e9e6df; } .corner.night.bottom { color: #6f6a5f; } }
   .corner a { color: inherit; text-decoration: none; } .corner a:hover { color: #e9e6df; }
-  #preloader { background: #00030a url(sun.jpg) center / min(70vmin, 640px) no-repeat; }
-  #preloader canvas { position: relative; background: #00030a; opacity: 0; }
+  #preloader { background: url(sun.jpg) center / min(70vmin, 640px) no-repeat; }
+  #preloader canvas { position: relative; opacity: 0; }
   #preloader.live canvas { opacity: 1; }
   #preloader.static canvas { display: none; }
 </style>
@@ -39,11 +44,12 @@
 <body>
 
 
-<div class="corner" style="left:20px;top:20px"><b>viaspinosa.art</b></div>
-<div class="corner" style="right:20px;top:20px">скоро</div>
-<div class="corner" style="left:20px;bottom:20px"><a href="https://t.me/spottedword">nab ↗</a></div>
-<div class="corner" style="right:20px;bottom:20px"><a href="https://t.me/strangejell_stuff">strangejell ↗</a></div>
+<div class="corner night top" style="left:20px;top:20px"><b>viaspinosa.art</b></div>
+<div class="corner day top" style="right:20px;top:20px">скоро</div>
+<div class="corner night bottom" style="left:20px;bottom:20px"><a href="https://t.me/spottedword">nab ↗</a></div>
+<div class="corner day bottom" style="right:20px;bottom:20px"><a href="https://t.me/strangejell_stuff">strangejell ↗</a></div>
 <div id="preloader"><canvas id="c"></canvas></div>
+<div class="grain" aria-hidden="true"></div>
 
 
 <script type="module">
@@ -52,6 +58,9 @@ import * as THREE from "./vendor/three.module.min.js";
 /* ---------- параметры ---------- */
 const BG = new THREE.Color(0x00030a);
 const FG = new THREE.Color(0xf2f0ea);
+// дневная половина (Лиза): временные цвета из наброска
+const BG2 = new THREE.Color(0xf3eee3);
+const FG2 = new THREE.Color(0x2340e8);
 const P = { px: 2, contrast: 1.2, lump: 1.75, speed: 0.55, tilt: -0.34 };
 const LOOP = true;
 const MIN_SHOW = 2600;          // минимум показа, мс
@@ -131,18 +140,24 @@ const rim = new THREE.DirectionalLight(0xffffff, .7); rim.position.set(4, -2, -3
 const rt = new THREE.WebGLRenderTarget(1, 1, { magFilter: THREE.NearestFilter, minFilter: THREE.NearestFilter });
 const post = new THREE.ShaderMaterial({
   uniforms: { tex: { value: rt.texture }, res: { value: new THREE.Vector2() }, px: { value: P.px },
-              contrast: { value: P.contrast }, bg: { value: BG }, fg: { value: FG }, seed: { value: 0 } },
+              contrast: { value: P.contrast }, bg: { value: BG }, fg: { value: FG }, bg2: { value: BG2 }, fg2: { value: FG2 }, vert: { value: 0 }, seed: { value: 0 } },
   vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
   fragmentShader: `
-    uniform sampler2D tex; uniform vec2 res; uniform float px, contrast, seed; uniform vec3 bg, fg; varying vec2 vUv;
+    uniform sampler2D tex; uniform vec2 res; uniform float px, contrast, seed, vert; uniform vec3 bg, fg, bg2, fg2; varying vec2 vUv;
     float hash(vec2 p){ return fract(sin(dot(p + seed*17.13, vec2(12.9898, 78.233))) * 43758.5453); }
+    float hash2(vec2 p){ return fract(sin(dot(p + seed*7.31, vec2(39.3468, 11.135))) * 24634.6345); }
     void main(){
       vec2 cell = floor(gl_FragCoord.xy / px);
       vec2 uv = (cell + .5) * px / res;
       float l = dot(texture2D(tex, uv).rgb, vec3(.299,.587,.114));
       l = clamp(pow(l, 1.15) * contrast, 0., 1.);
       float on = (l > .02) ? step(hash(cell), l) : 0.;
-      gl_FragColor = vec4(mix(bg, fg, on), 1.);
+      // ночь → день: слева направо, на вертикальном экране сверху вниз; переход тем же зерном
+      float t = mix(gl_FragCoord.x / res.x, 1. - gl_FragCoord.y / res.y, vert);
+      float s = smoothstep(.3, .7, t);
+      float day = s <= 0. ? 0. : (s >= 1. ? 1. : step(hash2(cell), s));
+      vec3 B = mix(bg, bg2, day), F = mix(fg, fg2, day);
+      gl_FragColor = vec4(mix(B, F, on), 1.);
     }`
 });
 const postScene = new THREE.Scene();
@@ -153,8 +168,8 @@ function resize() {
   const w = innerWidth, h = innerHeight, dpr = Math.min(devicePixelRatio, 2);
   renderer.setPixelRatio(dpr); renderer.setSize(w, h, false);
   rt.setSize(w*dpr, h*dpr); post.uniforms.res.value.set(w*dpr, h*dpr);
-  camera.aspect = w / h;
-  camera.position.z = w < h ? 7.2 * Math.min(1.7, h / w * .8) : 7.2;  // на телефоне кольцо целиком
+  camera.aspect = w / h; post.uniforms.vert.value = w < h ? 1 : 0;
+  camera.position.z = w < h ? 7.2 * Math.min(2.2, h / w) : 7.2;  // на телефоне кольцо целиком
   camera.updateProjectionMatrix();
 }
 addEventListener("resize", resize); resize();

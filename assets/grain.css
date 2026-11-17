@@ -1,0 +1,19 @@
+/* Мягкое зерно поверх всего сайта. Подключать на каждой странице:
+   <link rel="stylesheet" href="/assets/grain.css"> и <div class="grain" aria-hidden="true"></div> в конце body */
+.grain {
+  position: fixed; inset: -50%; width: 200%; height: 200%;
+  z-index: 9999; pointer-events: none;
+  background: url(/assets/grain.png) repeat;
+  opacity: var(--grain-opacity, .3);
+  animation: grain-shift 2.4s steps(6) infinite;
+}
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  17%  { transform: translate(-7%, 3%); }
+  33%  { transform: translate(4%, -6%); }
+  50%  { transform: translate(-3%, 8%); }
+  67%  { transform: translate(8%, 2%); }
+  83%  { transform: translate(-5%, -4%); }
+  100% { transform: translate(0, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .grain { animation: none; } }
