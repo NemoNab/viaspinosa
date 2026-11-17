@@ -32,8 +32,8 @@
   .corner { position: fixed; z-index: 15; font: 400 11px/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #8b8880; }
   .corner b { font-weight: 400; color: #e9e6df; }
   .corner.day { color: #6f6a5f; } .corner.day b, .corner.day a:hover { color: #1c1a16; }
-  body { background: linear-gradient(90deg, #00030a 35%, #f3eee3 65%); }
-  @media (max-aspect-ratio: 1/1) { body { background: linear-gradient(180deg, #00030a 35%, #f3eee3 65%); } .corner.day.top { color: #8b8880; } .corner.day.top b { color: #e9e6df; } .corner.night.bottom { color: #6f6a5f; } }
+  body { background: linear-gradient(90deg, #00030a 47%, #f3eee3 53%); }
+  @media (max-aspect-ratio: 1/1) { body { background: linear-gradient(180deg, #00030a 47%, #f3eee3 53%); } .corner.day.top { color: #8b8880; } .corner.day.top b { color: #e9e6df; } .corner.night.bottom { color: #6f6a5f; } }
   .corner a { color: inherit; text-decoration: none; } .corner a:hover { color: #e9e6df; }
   #preloader { background: url(sun.jpg) center / min(70vmin, 640px) no-repeat; }
   #preloader canvas { position: relative; opacity: 0; }
@@ -154,7 +154,7 @@ const post = new THREE.ShaderMaterial({
       float on = (l > .02) ? step(hash(cell), l) : 0.;
       // ночь → день: слева направо, на вертикальном экране сверху вниз; переход тем же зерном
       float t = mix(gl_FragCoord.x / res.x, 1. - gl_FragCoord.y / res.y, vert);
-      float s = smoothstep(.3, .7, t);
+      float s = smoothstep(.47, .53, t);
       float day = s <= 0. ? 0. : (s >= 1. ? 1. : step(hash2(cell), s));
       vec3 B = mix(bg, bg2, day), F = mix(fg, fg2, day);
       gl_FragColor = vec4(mix(B, F, on), 1.);
