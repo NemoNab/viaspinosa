@@ -101,6 +101,7 @@ window.PALETTES = [
   .bar a:hover, .bar button:hover { color: var(--i); }
   .bar b { font-weight: 400; color: var(--i); }
   .who { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 56px 0 48px; max-width: 560px; }
+  .head { display: flex; flex-direction: column; gap: 20px; }
   .ava { width: 168px; height: 168px; border-radius: 50%; display: block; }
   .name { margin: 0; font: 500 clamp(52px, 7.2vw, 112px)/.92 var(--mono); letter-spacing: -.06em; text-transform: lowercase; color: var(--f); }
   .name a { text-decoration: none; }
@@ -114,11 +115,21 @@ window.PALETTES = [
   .links span { color: var(--m); }
   .foot { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); border-top: 1px solid var(--ln); padding-top: 14px; display: flex; justify-content: space-between; }
 
+  /* телефон: развилка ровно в экран, две половины по 50%, без прокрутки */
   @media (max-width: 760px) {
-    #home { grid-template-columns: 1fr; }
-    .who { padding: 40px 0 36px; }
-    .ava { width: 128px; height: 128px; }
-    .half { min-height: 0; }
+    #home { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+    .half { padding: 14px 16px 16px; min-height: 0; }
+    .who { padding: 0; gap: 10px; justify-content: center; max-width: none; }
+    .head { flex-direction: row; align-items: center; gap: 14px; }
+    .ava { width: 64px; height: 64px; flex: none; }
+    .name { font-size: clamp(34px, 11vw, 48px); }
+    .desc { font-size: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .tags, .foot { display: none; }
+    .links a, .links span { padding: 8px 12px; }
+  }
+  @media (max-width: 760px) and (max-height: 700px) {
+    .desc { -webkit-line-clamp: 2; }
+    .real { display: none; }
   }
 </style>
 </head>
@@ -126,10 +137,12 @@ window.PALETTES = [
 
 <main id="home" aria-label="Портфолио">
   <section class="half n grain-surface" aria-labelledby="n-name">
-    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span id="n-pal">01</span></div>
+    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button></div>
     <div class="who">
-      <canvas class="ava" data-side="n" width="336" height="336" aria-hidden="true"></canvas>
-      <h2 class="name" id="n-name"><a href="https://t.me/spottedword">nab</a></h2>
+      <div class="head">
+        <canvas class="ava" data-side="n" width="336" height="336" aria-hidden="true"></canvas>
+        <h2 class="name" id="n-name"><a href="https://t.me/spottedword">nab</a></h2>
+      </div>
       <div class="real">Сергей Потапов · Екатеринбург → Алматы</div>
       <p class="desc">Пиар, картинки и маленькие системы для культурных проектов. Шесть лет в независимом книжном: от торгового зала до PR-директора.</p>
       <div class="tags">[PR] пиар и партнёрства · [Д] дизайн · [А] автоматизация</div>
@@ -138,10 +151,12 @@ window.PALETTES = [
     <div class="foot"><span>nemonab</span><span>/nemonab</span></div>
   </section>
   <section class="half l grain-surface" aria-labelledby="l-name">
-    <div class="bar"><span id="l-pal">02</span><span>RU</span></div>
+    <div class="bar"><span></span><span>RU</span></div>
     <div class="who">
-      <canvas class="ava" data-side="l" width="336" height="336" aria-hidden="true"></canvas>
-      <h2 class="name" id="l-name"><a href="https://t.me/strangejell_stuff">strangejell</a></h2>
+      <div class="head">
+        <canvas class="ava" data-side="l" width="336" height="336" aria-hidden="true"></canvas>
+        <h2 class="name" id="l-name"><a href="https://t.me/strangejell_stuff">strangejell</a></h2>
+      </div>
       <div class="real">Лиза Конышева · Алматы</div>
       <p class="desc">2D-аниматор, арт-директор и художница. Рисует, лепит, режет гравюры и оживляет это на экране.</p>
       <div class="tags">анимация · рисунок · живопись · скульптура · гравюра</div>
@@ -179,8 +194,6 @@ window.PALETTES = [
     if (meta) meta.setAttribute("content", window.PAL.intro.bg);
   }
   window.leaveIntro = leave;
-  document.getElementById("n-pal").textContent = "01 / " + window.PAL.n.name;
-  document.getElementById("l-pal").textContent = "02 / " + window.PAL.l.name;
   intro.addEventListener("pointerdown", leave);
   intro.addEventListener("wheel", leave, { passive: true });
   intro.addEventListener("touchmove", leave, { passive: true });
