@@ -25,11 +25,11 @@
    Первый экран: случайная палитра, не повторяя прошлую. Развилка: левая половина в палитре Наба,
    правая — в палитре Лизы; палитра первого экрана остаётся у своего автора. ?p=номер — конкретная. */
 window.PALETTES = [
-  { name: "ночь",    by: "n", bg: "#00030a", fg: "#f2f0ea" },
-  { name: "бирюза",  by: "n", bg: "#121014", fg: "#57d3e6" },
-  { name: "красный", by: "n", bg: "#e5e4de", fg: "#b83f45" },
-  { name: "охра",    by: "l", bg: "#151513", fg: "#dcac74" },
-  { name: "хвоя",    by: "l", bg: "#dedbd2", fg: "#1e5855" }
+  { name: "ночь",    by: "n", bg: "#00030a", fg: "#f2f0ea", grain: .3 },
+  { name: "бирюза",  by: "n", bg: "#121014", fg: "#57d3e6", grain: .15 },
+  { name: "красный", by: "n", bg: "#e5e4de", fg: "#b83f45", grain: .3 },
+  { name: "охра",    by: "l", bg: "#151513", fg: "#dcac74", grain: .15 },
+  { name: "хвоя",    by: "l", bg: "#dedbd2", fg: "#1e5855", grain: .15 }
 ];
 (function () {
   var P = window.PALETTES, i, last = null, q = new URLSearchParams(location.search).get("p");
@@ -48,10 +48,9 @@ window.PALETTES = [
     r.setProperty(prefix + "ink", l ? "#1c1a16" : "#e9e6df");
     r.setProperty(prefix + "mute", l ? "#6f6a5f" : "#8b8880");
     r.setProperty(prefix + "line", l ? "rgba(28,26,22,.14)" : "rgba(233,230,223,.12)");
-    // зерно: одна полярность, на средних тонах тише
-    var L = lum(pal.bg), k = Math.pow(Math.abs(2 * L - 1), 3);
-    r.setProperty(prefix + "g-img", l ? "url(/assets/grain-dark.png)" : "url(/assets/grain-light.png)");
-    r.setProperty(prefix + "g-a", String(Math.round((.06 + .32 * k) * 100) / 100));
+    // зерно: как было изначально, на «средних» палитрах вдвое тише (значение grain у палитры)
+    r.setProperty(prefix + "g-img", "url(/assets/grain.png)");
+    r.setProperty(prefix + "g-a", String(pal.grain));
   }
   window.PAL = { intro: intro, n: pick("n"), l: pick("l") };
   set("--", intro); r.setProperty("--g-img0", r.getPropertyValue("--g-img")); r.setProperty("--g-a0", r.getPropertyValue("--g-a")); set("--n-", window.PAL.n); set("--l-", window.PAL.l);
