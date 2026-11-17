@@ -19,7 +19,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Зернистое кольцо вокруг шара на чёрном фоне">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preload" href="/assets/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="modulepreload" href="/assets/sun.min.js">
 <script>
 /* Палитры из работ: n — Наб (канал «незаметные слова»), l — Лиза («лиза живет»).
    Первый экран: случайная палитра, не повторяя прошлую. Развилка: левая половина в палитре Наба,
@@ -245,7 +245,7 @@ window.PALETTES = [
 </script>
 
 <script type="module">
-import { startSun } from "/assets/sun.js";
+import { startSun } from "/assets/sun.min.js";
 const intro = document.getElementById("intro");
 try {
   window.SUN = startSun(document.getElementById("c"), window.PAL.intro, () => intro.classList.add("live"));

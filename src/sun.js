@@ -1,6 +1,7 @@
 /* «Солнце»: неровное кольцо и шар, однобитное зерно. Используется на первом экране.
    startSun(canvas, { bg, fg }) → { pause(), resume() } */
-import * as THREE from "../vendor/three.module.min.js";
+import { WebGLRenderer, Scene, PerspectiveCamera, OrthographicCamera, TorusGeometry, IcosahedronGeometry, PlaneGeometry, MeshStandardMaterial, ShaderMaterial, Mesh, Group, AmbientLight, DirectionalLight, WebGLRenderTarget, NearestFilter, Vector2, Vector3 } from "three";
+const THREE = { WebGLRenderer, Scene, PerspectiveCamera, OrthographicCamera, TorusGeometry, IcosahedronGeometry, PlaneGeometry, MeshStandardMaterial, ShaderMaterial, Mesh, Group, AmbientLight, DirectionalLight, WebGLRenderTarget, NearestFilter, Vector2, Vector3 };
 
 const P = { px: 2, contrast: 1.2, lump: 1.75, speed: 0.55, tilt: -0.34 };
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
