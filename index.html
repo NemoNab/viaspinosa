@@ -16,6 +16,10 @@
   .corner { position: fixed; z-index: 15; font: 400 11px/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #8b8880; }
   .corner b { font-weight: 400; color: #e9e6df; }
   .corner a { color: inherit; text-decoration: none; } .corner a:hover { color: #e9e6df; }
+  #preloader { background: #00030a url(sun.jpg) center / min(70vmin, 640px) no-repeat; }
+  #preloader canvas { position: relative; background: #00030a; opacity: 0; }
+  #preloader.live canvas { opacity: 1; }
+  #preloader.static canvas { display: none; }
 </style>
 </head>
 <body>
@@ -28,11 +32,8 @@
 <div id="preloader"><canvas id="c"></canvas></div>
 
 
-<script type="importmap">
-{ "imports": { "three": "./vendor/three.module.min.js" } }
-</script>
 <script type="module">
-import * as THREE from "three";
+import * as THREE from "./vendor/three.module.min.js";
 
 /* ---------- параметры ---------- */
 const BG = new THREE.Color(0x00030a);
@@ -91,7 +92,10 @@ ringGeo.userData.apply(P.lump); sunGeo.userData.apply(P.lump);
 
 /* ---------- сцена ---------- */
 const canvas = document.getElementById("c");
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+const pre = document.getElementById("preloader");
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false }); }
+catch (e) { document.getElementById("preloader").classList.add("static"); throw e; }
 renderer.setClearColor(0x000000, 1);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, .05, 50);
@@ -148,7 +152,7 @@ const easeIn = x => x*x*x;
 
 function frame(now) {
   const t = (now - t0) / 1000, dt = Math.min(.05, (now - last) / 1000); last = now;
-  const sp = reduce ? 0 : P.speed;
+  const sp = reduce ? P.speed * 0.35 : P.speed;
 
   spin.rotation.y += dt * .6 * sp;
   sun.rotation.y += dt * .5 * sp; sun.rotation.x += dt * .2 * sp;
@@ -161,6 +165,7 @@ function frame(now) {
 
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 1); renderer.render(scene, camera);
   renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+  if (!pre.classList.contains("live")) pre.classList.add("live");
   if (!document.getElementById("preloader").classList.contains("done") || exitAt === null) requestAnimationFrame(frame);
 }
 let baseZ = camera.position.z;
