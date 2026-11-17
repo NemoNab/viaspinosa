@@ -1,10 +1,10 @@
-/* Мягкое зерно поверх всего сайта. Подключать на каждой странице:
-   <link rel="stylesheet" href="/assets/grain.css"> и <div class="grain" aria-hidden="true"></div> в конце body */
-.grain {
-  position: fixed; inset: -50%; width: 200%; height: 200%;
-  z-index: 9999; pointer-events: none;
-  background: url(/assets/grain.png) repeat;
-  opacity: var(--grain-opacity, .3);
+/* Мягкое зерно. Зёрна одной полярности: на тёмном фоне светлые, на светлом тёмные,
+   а сила зависит от яркости фона (на средних тонах тише). Всё считает скрипт палитры:
+   элементу с классом .grain-surface нужны переменные --g-img и --g-a. */
+.grain-surface { position: relative; overflow: hidden; }
+.grain-surface::after {
+  content: ""; position: absolute; inset: -50%; z-index: 5; pointer-events: none;
+  background: var(--g-img) repeat; opacity: var(--g-a, .3);
   animation: grain-shift 2.4s steps(6) infinite;
 }
 @keyframes grain-shift {
@@ -16,4 +16,4 @@
   83%  { transform: translate(-5%, -4%); }
   100% { transform: translate(0, 0); }
 }
-@media (prefers-reduced-motion: reduce) { .grain { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .grain-surface::after { animation: none; } }
