@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>viaspinosa.art</title>
+<meta name="description" content="viaspinosa.art — Nab и strangejell. Скоро.">
+<style>
+  html, body { margin: 0; height: 100%; background: #00030a; color: #e9e6df; font: 16px/1.5 system-ui, sans-serif; }
+  #page { min-height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+  #page h1 { font: 400 40px/1.1 Georgia, serif; margin: 0; }
+  #page button { background: none; color: inherit; border: 1px solid #e9e6df55; border-radius: 99px; padding: 8px 16px; cursor: pointer; font: inherit; }
+  #preloader { position: fixed; inset: 0; z-index: 10; background: #00030a; transition: opacity .6s ease; }
+  #preloader canvas { display: block; width: 100%; height: 100%; }
+  #preloader.done { opacity: 0; pointer-events: none; }
+  #tune { position: fixed; right: 12px; bottom: 12px; z-index: 20; font-size: 12px; color: #e9e6df99; background: #00030acc; padding: 8px 10px; border: 1px solid #e9e6df22; border-radius: 8px; display: grid; grid-template-columns: auto 110px 34px; gap: 4px 8px; align-items: center; }
+  #tune input { width: 110px; }
+  #tune output { text-align: right; color: #e9e6df; }
+  #tune button { grid-column: 1 / -1; margin-top: 4px; background: none; color: #e9e6df; border: 1px solid #e9e6df55; border-radius: 6px; padding: 5px; cursor: pointer; font: inherit; }
+  .corner { position: fixed; z-index: 15; font: 400 11px/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: #8b8880; }
+  .corner b { font-weight: 400; color: #e9e6df; }
+  .corner a { color: inherit; text-decoration: none; } .corner a:hover { color: #e9e6df; }
+</style>
+</head>
+<body>
+
+
+<div class="corner" style="left:20px;top:20px"><b>viaspinosa.art</b></div>
+<div class="corner" style="right:20px;top:20px">скоро</div>
+<div class="corner" style="left:20px;bottom:20px"><a href="https://t.me/spottedword">nab ↗</a></div>
+<div class="corner" style="right:20px;bottom:20px"><a href="https://t.me/strangejell_stuff">strangejell ↗</a></div>
+<div id="preloader"><canvas id="c"></canvas></div>
+
+<!-- Панель для подбора параметров, на сайте её не будет -->
+<div id="tune">
+  <label for="t-px">зерно</label><input id="t-px" type="range" min="1" max="5" step="1" value="2">
+  <label for="t-con">контраст</label><input id="t-con" type="range" min="0.6" max="2.4" step="0.05" value="1.2">
+  <label for="t-lump">рельеф</label><input id="t-lump" type="range" min="0" max="2" step="0.05" value="1.75">
+  <label for="t-spd">скорость</label><input id="t-spd" type="range" min="0" max="3" step="0.05" value="0.55">
+  <label for="t-tilt">наклон</label><input id="t-tilt" type="range" min="-0.8" max="0.8" step="0.02" value="-0.34">
+  <button id="t-copy">Скопировать настройки</button>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+
+/* ---------- параметры ---------- */
+const BG = new THREE.Color(0x00030a);
+const FG = new THREE.Color(0xf2f0ea);
+const P = { px: 2, contrast: 1.2, lump: 1.75, speed: 0.55, tilt: -0.34 };
+// режим настройки: viaspinosa.art/...?tune — панель с ползунками и бесконечный показ
+const LOOP = true; const TUNE = new URLSearchParams(location.search).has("tune");
+if (!TUNE) document.getElementById("tune").remove();
+const MIN_SHOW = 2600;          // минимум показа, мс
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- шум (simplex 3D) для рельефа ---------- */
+const grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
+const perm = new Uint8Array(512);
+{ let s = 1337; const p = [...Array(256).keys()];
+  for (let i = 255; i > 0; i--) { s = (s * 16807) % 2147483647; const j = s % (i + 1); [p[i], p[j]] = [p[j], p[i]]; }
+  for (let i = 0; i < 512; i++) perm[i] = p[i & 255]; }
+function noise3(x, y, z) {
+  const F3 = 1/3, G3 = 1/6, s = (x+y+z)*F3;
+  const i = Math.floor(x+s), j = Math.floor(y+s), k = Math.floor(z+s), t = (i+j+k)*G3;
+  const x0 = x-i+t, y0 = y-j+t, z0 = z-k+t;
+  let i1,j1,k1,i2,j2,k2;
+  if (x0>=y0) { if (y0>=z0){i1=1;j1=0;k1=0;i2=1;j2=1;k2=0;} else if (x0>=z0){i1=1;j1=0;k1=0;i2=1;j2=0;k2=1;} else {i1=0;j1=0;k1=1;i2=1;j2=0;k2=1;} }
+  else { if (y0<z0){i1=0;j1=0;k1=1;i2=0;j2=1;k2=1;} else if (x0<z0){i1=0;j1=1;k1=0;i2=0;j2=1;k2=1;} else {i1=0;j1=1;k1=0;i2=1;j2=1;k2=0;} }
+  const pts = [[x0,y0,z0,0,0,0],[x0-i1+G3,y0-j1+G3,z0-k1+G3,i1,j1,k1],[x0-i2+2*G3,y0-j2+2*G3,z0-k2+2*G3,i2,j2,k2],[x0-1+.5,y0-1+.5,z0-1+.5,1,1,1]];
+  const ii=i&255, jj=j&255, kk=k&255; let n = 0;
+  for (const [a,b,c,di,dj,dk] of pts) {
+    let tt = .6 - a*a - b*b - c*c; if (tt < 0) continue;
+    const g = grad3[perm[ii+di+perm[jj+dj+perm[kk+dk]]] % 12]; tt *= tt;
+    n += tt*tt*(g[0]*a + g[1]*b + g[2]*c);
+  }
+  return 32*n;
+}
+const fbm = (x,y,z) => noise3(x,y,z)*.7 + noise3(x*2.1,y*2.1,z*2.1)*.3;
+
+/* ---------- геометрия: неровное кольцо и шар ---------- */
+function lumpy(geo, amt, freq, chunk) {
+  const pos = geo.attributes.position, nrm = geo.attributes.normal, v = new THREE.Vector3(), n = new THREE.Vector3();
+  const base = Float32Array.from(pos.array), baseN = Float32Array.from(nrm.array);
+  geo.userData.apply = (k) => {
+    for (let i = 0; i < pos.count; i++) {
+      v.fromArray(base, i*3); n.fromArray(baseN, i*3);
+      let d = fbm(v.x*freq, v.y*freq, v.z*freq) * amt;
+      // «обломки»: резкие выступы, как на рендере из Illustrator
+      const c = noise3(v.x*chunk+7, v.y*chunk, v.z*chunk);
+      d += Math.max(0, c - .25) * amt * 1.6;
+      v.addScaledVector(n, d * k);
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    pos.needsUpdate = true; geo.computeVertexNormals();
+  };
+  geo.userData.apply(1);
+  return geo;
+}
+const ringGeo = lumpy(new THREE.TorusGeometry(1.55, .16, 48, 420), .1, 2.2, 4.2);
+const sunGeo  = lumpy(new THREE.IcosahedronGeometry(.36, 6), .05, 4, 6);
+ringGeo.userData.apply(P.lump); sunGeo.userData.apply(P.lump);
+
+/* ---------- сцена ---------- */
+const canvas = document.getElementById("c");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+renderer.setClearColor(0x000000, 1);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, .05, 50);
+camera.position.set(0, 0, 7.2);
+
+const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .85, metalness: 0, flatShading: false });
+const ring = new THREE.Mesh(ringGeo, mat);
+const sun  = new THREE.Mesh(sunGeo, mat);
+// spin крутит кольцо вокруг вертикальной оси (вправо), axis задаёт наклон этой оси
+const spin = new THREE.Group(); spin.add(ring);
+const axis = new THREE.Group(); axis.add(spin); axis.rotation.z = P.tilt;
+const group = new THREE.Group(); group.add(axis, sun); scene.add(group);
+
+scene.add(new THREE.AmbientLight(0xffffff, .1));
+const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-3, 4, 4); scene.add(key);
+const rim = new THREE.DirectionalLight(0xffffff, .7); rim.position.set(4, -2, -3); scene.add(rim);
+
+/* ---------- пост-обработка: однобитное зерно, как «Порог» в Photoshop ---------- */
+const rt = new THREE.WebGLRenderTarget(1, 1, { magFilter: THREE.NearestFilter, minFilter: THREE.NearestFilter });
+const post = new THREE.ShaderMaterial({
+  uniforms: { tex: { value: rt.texture }, res: { value: new THREE.Vector2() }, px: { value: P.px },
+              contrast: { value: P.contrast }, bg: { value: BG }, fg: { value: FG }, seed: { value: 0 } },
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
+  fragmentShader: `
+    uniform sampler2D tex; uniform vec2 res; uniform float px, contrast, seed; uniform vec3 bg, fg; varying vec2 vUv;
+    float hash(vec2 p){ return fract(sin(dot(p + seed*17.13, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main(){
+      vec2 cell = floor(gl_FragCoord.xy / px);
+      vec2 uv = (cell + .5) * px / res;
+      float l = dot(texture2D(tex, uv).rgb, vec3(.299,.587,.114));
+      l = clamp(pow(l, 1.15) * contrast, 0., 1.);
+      float on = (l > .02) ? step(hash(cell), l) : 0.;
+      gl_FragColor = vec4(mix(bg, fg, on), 1.);
+    }`
+});
+const postScene = new THREE.Scene();
+postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post));
+const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+function resize() {
+  const w = innerWidth, h = innerHeight, dpr = Math.min(devicePixelRatio, 2);
+  renderer.setPixelRatio(dpr); renderer.setSize(w, h, false);
+  rt.setSize(w*dpr, h*dpr); post.uniforms.res.value.set(w*dpr, h*dpr);
+  camera.aspect = w / h;
+  camera.position.z = w < h ? 7.2 * Math.min(1.7, h / w * .8) : 7.2;  // на телефоне кольцо целиком
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize); resize();
+
+/* ---------- анимация: кольцо вращается вокруг своей оси ---------- */
+let t0 = performance.now(), exitAt = null, last = t0, grainTick = 0;
+const ease = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x*x*x;
+
+function frame(now) {
+  const t = (now - t0) / 1000, dt = Math.min(.05, (now - last) / 1000); last = now;
+  const sp = reduce ? 0 : P.speed;
+
+  spin.rotation.y += dt * .6 * sp;
+  sun.rotation.y += dt * .5 * sp; sun.rotation.x += dt * .2 * sp;
+
+  // выход: просто растворяемся
+  if (exitAt !== null && now - exitAt > 650) document.getElementById("preloader").classList.add("done");
+
+  // зерно чуть «дышит», 12 раз в секунду, как плёнка
+  if ((grainTick += dt) > 1/12) { grainTick = 0; post.uniforms.seed.value = reduce ? 0 : Math.random()*10; }
+
+  renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 1); renderer.render(scene, camera);
+  renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+  if (!document.getElementById("preloader").classList.contains("done") || exitAt === null) requestAnimationFrame(frame);
+}
+let baseZ = camera.position.z;
+requestAnimationFrame(frame);
+
+/* ---------- когда уходить ---------- */
+function startExit() {
+  if (exitAt !== null) return;
+  baseZ = camera.position.z;
+  exitAt = performance.now();
+  document.getElementById("preloader").classList.add("done");
+}
+const loaded = new Promise(r => document.readyState === "complete" ? r() : addEventListener("load", r));
+if (!LOOP) {
+  Promise.all([loaded, new Promise(r => setTimeout(r, MIN_SHOW))]).then(startExit);
+  document.getElementById("preloader").addEventListener("click", startExit);   // клик пропускает
+}
+
+if (document.getElementById("replay")) document.getElementById("replay").onclick = () => {
+  resize(); camera.position.x = 0; sun.visible = true; exitAt = null; t0 = performance.now();
+  document.getElementById("preloader").classList.remove("done");
+  requestAnimationFrame(frame); if (!LOOP) setTimeout(startExit, MIN_SHOW);
+};
+
+/* ---------- панель настройки (только с ?tune) ---------- */
+if (TUNE) {
+const bind = (id, key, fn) => {
+  const el = document.getElementById(id), out = document.createElement("output");
+  el.after(out); const show = () => out.textContent = (+el.value).toFixed(2).replace(/\.?0+$/, "");
+  show(); el.addEventListener("input", () => { P[key] = +el.value; show(); fn && fn(); });
+};
+bind("t-px", "px", () => post.uniforms.px.value = P.px);
+bind("t-con", "contrast", () => post.uniforms.contrast.value = P.contrast);
+bind("t-spd", "speed");
+bind("t-tilt", "tilt", () => axis.rotation.z = P.tilt);
+document.getElementById("t-copy").onclick = async (e) => {
+  const txt = JSON.stringify(P);
+  try { await navigator.clipboard.writeText(txt); e.target.textContent = "Скопировано"; }
+  catch { prompt("Скопируйте настройки:", txt); }
+  setTimeout(() => e.target.textContent = "Скопировать настройки", 1500);
+};
+bind("t-lump", "lump", () => { ringGeo.userData.apply(P.lump); sunGeo.userData.apply(P.lump); });
+}
+</script>
+</body>
+</html>
