@@ -2,7 +2,7 @@
 (function () {
   var C = window.CV, root = document.getElementById("cv");
   if (!C || !root) return;
-  var key = document.body.getAttribute("data-version") || "ops";
+  var key = document.body.getAttribute("data-version") || "auto";
   var V = C.versions[key];
   var SHORT = /(^|[\s(«])([А-Яа-яЁёA-Za-z]{1,2}|без|для|над|под|при|про|что|как|или|это|все|так) (?=\S)/g;
 
@@ -15,14 +15,14 @@
   }
   function isPh(s) { return /^\s*\[.*\]\s*$/.test(s || ""); }
 
-  var other = key === "ops" ? "pr" : "ops";
-  var href = { ops: "/cv/", pr: "/cv/pr/" };
+  var ORDER = ["auto", "pr"];   /* порядок в переключателе постоянный, активная версия подсвечена */
+  var href = { auto: "/spotted/cv/auto/", pr: "/spotted/cv/pr/" };
   var h = [];
 
   if (C.draft) h.push('<div class="draft">черновик · тексты в работе</div>');
   h.push('<div class="wrap">');
   h.push('<div class="bar"><a href="/">← viaspinosa.art</a>' +
-    '<span class="hide-m vswitch">cv: <a class="on" href="' + href[key] + '">' + esc(V.label) + '</a> · <a href="' + href[other] + '">' + esc(C.versions[other].label) + '</a></span>' +
+    '<span class="hide-m vswitch">cv: ' + ORDER.map(function (k) { return '<a' + (k === key ? ' class="on" aria-current="page"' : '') + ' href="' + href[k] + '">' + esc(C.versions[k].label) + '</a>'; }).join(" · ") + '</span>' +
     '<span class="st">● ' + tx(V.status) + '</span></div>');
 
   /* шапка */
