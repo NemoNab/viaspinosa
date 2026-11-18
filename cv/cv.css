@@ -1,0 +1,127 @@
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url(/assets/fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-2199; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url(/assets/fonts/jetbrains-mono-cyrillic-400-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 500; src: url(/assets/fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-2199; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 500; src: url(/assets/fonts/jetbrains-mono-cyrillic-500-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+@font-face { font-family: "Onest"; font-weight: 400; src: url(/assets/fonts/onest-latin-400-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+@font-face { font-family: "Onest"; font-weight: 400; src: url(/assets/fonts/onest-cyrillic-400-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+@font-face { font-family: "Onest"; font-weight: 500; src: url(/assets/fonts/onest-latin-500-normal.woff2) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+@font-face { font-family: "Onest"; font-weight: 500; src: url(/assets/fonts/onest-cyrillic-500-normal.woff2) format("woff2"); unicode-range: U+0400-045F; }
+
+:root { --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif;
+        --bg: #00030a; --f: #f2f0ea; --i: #e9e6df; --m: #8b8880; --ln: rgba(233,230,223,.12);
+        --g-img: url(/assets/grain.png); --g-a: .3; --pad: 28px; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--i); font: 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+.gfix.grain-surface { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+.mono, .bar, .lbl, .k { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 var(--pad); }
+
+/* сетка «модуль»: 12 колонок, слева подпись раздела */
+.row { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; }
+.lbl { grid-column: 1 / span 3; color: var(--m); padding-top: 6px; }
+.body { grid-column: 4 / -1; }
+section { border-top: 1px solid var(--ln); padding: 40px 0 56px; }
+
+.bar { display: flex; justify-content: space-between; gap: 16px; padding: 20px 0; color: var(--m); }
+.bar a { text-decoration: none; } .bar a:hover { color: var(--f); }
+.bar .st { color: var(--i); }
+
+/* шапка */
+.hero { padding: 72px 0 64px; border: 0; }
+.name { grid-column: 1 / span 7; margin: 0; font: 500 clamp(56px, 8vw, 132px)/.9 var(--mono); letter-spacing: -.06em; text-transform: lowercase; color: var(--f); }
+.pitch { grid-column: 1 / span 7; margin: 36px 0 0; font: 400 clamp(22px, 2.1vw, 30px)/1.3 var(--sans); max-width: 26em; }
+.facts { grid-column: 9 / -1; align-self: end; display: grid; gap: 0; }
+.fact { border-top: 1px solid var(--ln); padding: 14px 0 16px; }
+.fact b { display: block; font: 500 34px/1 var(--mono); letter-spacing: -.04em; color: var(--f); margin-bottom: 8px; }
+.fact span { font-size: 14px; color: var(--i); }
+.contacts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 48px; }
+.pill { font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border: 1px solid var(--ln); border-radius: 99px; padding: 10px 14px; color: var(--i); }
+a.pill:hover { border-color: var(--f); color: var(--f); }
+.pill.main { background: var(--f); color: var(--bg); border-color: var(--f); }
+.pill.dim { color: var(--m); }
+
+/* кейсы */
+.case { display: grid; grid-template-columns: 56px 1fr; column-gap: 20px; padding: 28px 0 32px; border-top: 1px solid var(--ln); }
+.case:first-child { border-top: 0; padding-top: 0; }
+.case .no { font: 500 13px/1.6 var(--mono); color: var(--m); }
+.case h3 { margin: 0 0 18px; font: 500 26px/1.15 var(--mono); letter-spacing: -.04em; text-transform: lowercase; color: var(--f); }
+.tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.tri p { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.k { color: var(--m); }
+.who { margin-top: 16px; font: 400 12px/1.5 var(--mono); color: var(--m); }
+.who i { font-style: normal; color: var(--i); }
+
+/* опыт */
+.job { display: grid; grid-template-columns: 180px 1fr; column-gap: 20px; padding: 20px 0 22px; border-top: 1px solid var(--ln); }
+.job:first-child { border-top: 0; padding-top: 0; }
+.job .when { font: 400 13px/1.6 var(--mono); color: var(--m); }
+.job h3 { margin: 0; font: 500 18px/1.35 var(--sans); color: var(--f); }
+.job .co { color: var(--m); font-weight: 400; }
+.job .fact-scope { margin: 10px 0 0; padding: 0; list-style: none; font-size: 15px; }
+.job .fact-scope li { padding-left: 18px; position: relative; margin-top: 4px; }
+.job .fact-scope li::before { content: "→"; position: absolute; left: 0; color: var(--m); font-family: var(--mono); font-size: 13px; }
+.note { margin: 6px 0 0; font: 400 12px/1.5 var(--mono); color: var(--m); }
+
+/* навыки */
+.cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.cols3 h3 { margin: 0 0 12px; font: 500 15px/1.3 var(--mono); text-transform: lowercase; color: var(--f); }
+.cols3 ul { margin: 0; padding: 0; list-style: none; font-size: 15px; }
+.cols3 li { padding: 7px 0; border-top: 1px solid var(--ln); }
+.cols3 li em { font-style: normal; font: 400 10px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); margin-left: 6px; }
+
+.end { padding: 40px 0 28px; border-top: 1px solid var(--ln); display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
+.end .big { font: 500 clamp(32px, 4vw, 56px)/1 var(--mono); letter-spacing: -.05em; text-transform: lowercase; color: var(--f); text-decoration: none; }
+
+@media screen and (max-width: 900px) {
+  :root { --pad: 16px; }
+  .row { grid-template-columns: 1fr; }
+  .lbl, .body, .name, .pitch, .facts, .contacts { grid-column: 1 / -1; }
+  .lbl { margin-bottom: 20px; padding-top: 0; }
+  .hero { padding: 40px 0 40px; }
+  .pitch { margin-top: 24px; }
+  .facts { margin-top: 32px; }
+  .contacts { margin-top: 28px; }
+  section { padding: 28px 0 36px; }
+  .case { grid-template-columns: 1fr; } .case .no { margin-bottom: 6px; }
+  .case h3 { font-size: 22px; }
+  .tri, .cols3 { grid-template-columns: 1fr; gap: 14px; }
+  .job { grid-template-columns: 1fr; } .job .when { margin-bottom: 4px; }
+  .bar .hide-m { display: none; }
+}
+
+/* заглушки и черновик */
+.ph { color: var(--m); border-bottom: 1px dashed currentColor; }
+.draft { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--bg); background: var(--f); padding: 8px var(--pad); text-align: center; }
+.vswitch a { text-decoration: none; color: var(--m); } .vswitch a.on { color: var(--f); }
+.edu { margin-top: 18px; font-size: 15px; color: var(--i); }
+button.pill { font: inherit; font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; background: none; cursor: pointer; }
+button.pill:hover { border-color: var(--f); color: var(--f); }
+
+/* печать: одна страница A4, светлая */
+@page { size: A4; margin: 9mm 10mm; }
+@media print {
+  :root { --bg: #fff; --f: #111; --i: #222; --m: #777; --ln: #ddd; --pad: 0px; }
+  html, body { background: #fff; font-size: 9.6pt; }
+  .gfix, .draft, .contacts .pill:not(.keep), .end, .bar .hide-m, .vswitch, button { display: none !important; }
+  .wrap { max-width: none; padding: 0; }
+  .bar { padding: 0 0 4mm; }
+  .hero { padding: 2mm 0 4mm; }
+  .name { font-size: 28pt; grid-column: 1 / -1; }
+  .pitch { font-size: 11.5pt; margin-top: 2.5mm; grid-column: 1 / -1; max-width: none; }
+  .facts { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); column-gap: 6mm; margin-top: 3mm; }
+  .fact { padding: 1.6mm 0 2mm; } .fact b { font-size: 15pt; margin-bottom: 1mm; } .fact span { font-size: 8.4pt; }
+  .contacts { margin-top: 2mm; } .contacts .pill.keep { border: 0; padding: 0 12px 0 0; background: none; color: #111; }
+  .edu { margin-top: 2mm; font-size: 8.6pt; }
+  section { padding: 2.4mm 0 2.6mm; }
+  .k { font-size: 6.6pt; }
+  .case, .job { break-inside: avoid; }
+  .lbl { grid-column: 1 / span 2; } .body { grid-column: 3 / -1; }
+  .case { padding: 1.4mm 0; grid-template-columns: 9mm 1fr; } .case h3 { font-size: 11pt; margin-bottom: 1mm; }
+  .tri { gap: 4mm; } .tri p { font-size: 8.6pt; margin-top: .6mm; line-height: 1.35; } .who { display: none; }
+  .job { padding: 1mm 0; grid-template-columns: 30mm 1fr; } .job h3 { font-size: 9.6pt; }
+  .job .fact-scope { margin-top: 1mm; font-size: 8.6pt; } .job .fact-scope li { margin-top: 0; }
+  .cols3 li { padding: .8mm 0; font-size: 8.6pt; } .cols3 h3 { margin-bottom: 1mm; font-size: 9pt; }
+  .ph { border: 0; }
+  a { text-decoration: none; }
+}
