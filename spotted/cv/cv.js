@@ -15,6 +15,9 @@
   }
   function isPh(s) { return /^\s*\[.*\]\s*$/.test(s || ""); }
 
+  /* статус общий для всего сайта: берётся из пульта (config.js), как на развилке */
+  var S = window.SITE || {}, st = S.status || {}; if ("on" in st) st = { n: st };
+  st = st.n || {}; var stText = st.on ? (st.text || "") : "";
   var ORDER = ["auto", "pr"];   /* порядок в переключателе постоянный, активная версия подсвечена */
   var href = { auto: "/spotted/cv/auto/", pr: "/spotted/cv/pr/" };
   var h = [];
@@ -23,7 +26,7 @@
   h.push('<div class="wrap">');
   h.push('<div class="bar"><a href="/spotted/">← раздел</a>' +
     '<span class="hide-m vswitch">cv: ' + ORDER.map(function (k) { return '<a' + (k === key ? ' class="on" aria-current="page"' : '') + ' href="' + href[k] + '">' + esc(C.versions[k].label) + '</a>'; }).join(" · ") + '</span>' +
-    '<span class="st">● ' + tx(V.status) + '</span></div>');
+    (stText ? '<span class="st">● ' + tx(stText) + '</span>' : '') + '</div>');
 
   /* шапка */
   h.push('<header class="hero row"><h1 class="name">' + esc(C.name.toLowerCase()) + '</h1>');
