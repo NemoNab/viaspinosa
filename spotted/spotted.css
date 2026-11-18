@@ -1,0 +1,85 @@
+/* Раздел /spotted/: главная «Дневник» и страница проекта «Модуль». */
+:root { --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif;
+        --bg: #00030a; --f: #f2f0ea; --i: #e9e6df; --t: #c9c6bf; --m: #8b8880; --dim: #4d4f55; --ln: #1c1f26; --ph: #12151c;
+        --g-img: url(/assets/grain.png); --g-a: .3; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--i); font: 15px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+.gfix.grain-surface { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+.mono, .meta, .tag { font: 400 11px/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--m); }
+.meta i { font-style: normal; color: var(--i); }
+.draft { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--bg); background: var(--f); padding: 8px 20px; text-align: center; }
+.ph-t { color: var(--m); border-bottom: 1px dashed currentColor; }
+
+/* верхняя строка: 5 колонок */
+.top { display: grid; grid-template-columns: repeat(5, 1fr); height: 56px; border-bottom: 1px solid var(--ln); position: sticky; top: 0; background: var(--bg); z-index: 4; }
+.top > * { padding: 20px 20px 0; font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); border-left: 1px solid var(--ln); }
+.top > :first-child { border-left: 0; color: var(--i); }
+.top a:hover, .top a.on { color: var(--f); }
+.top .tools { display: flex; justify-content: space-between; gap: 12px; }
+.top .tools b { font-weight: 400; color: var(--i); }
+
+/* картинки-заглушки */
+.ph { background: var(--ph); display: flex; align-items: flex-end; padding: 10px; color: var(--dim); font: 400 11px/1.2 var(--mono); width: 100%; }
+
+/* ---------- главная ---------- */
+.cols { display: grid; grid-template-columns: repeat(5, 1fr); min-height: calc(100vh - 56px - 48px); }
+.col { border-left: 1px solid var(--ln); padding: 24px 20px 48px; display: flex; flex-direction: column; gap: 36px; min-width: 0; }
+.col:first-child { border-left: 0; }
+.col > .meta:first-child { margin-bottom: -20px; }
+.chead { display: none; }
+.entry { display: flex; flex-direction: column; gap: 10px; }
+a.entry:hover h3, a.entry:hover .meta i { color: var(--f); text-decoration: underline; text-underline-offset: 3px; }
+.entry p { margin: 0; color: var(--t); }
+.tag { text-transform: none; letter-spacing: 0; }
+.profile h1 { font: 500 15px/1.35 var(--sans); margin: 10px 0 6px; color: var(--f); }
+.profile p { margin: 0; color: var(--t); }
+.status { display: inline-flex; gap: 8px; align-items: center; font: 400 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; border: 1px solid #2c3039; border-radius: 99px; padding: 8px 12px; align-self: flex-start; }
+.status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--i); }
+.legend { font: 400 11px/1.9 var(--mono); color: var(--m); }
+.legend b { font-weight: 400; color: var(--i); }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; border: 1px solid #2c3039; border-radius: 99px; padding: 10px 14px; color: var(--i); }
+.pill:hover { border-color: var(--f); color: var(--f); }
+.pill.main { background: var(--f); color: var(--bg); border-color: var(--f); }
+.bottom { height: 48px; border-top: 1px solid var(--ln); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font: 400 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--m); }
+.bottom a:hover { color: var(--f); }
+
+/* ---------- страница проекта ---------- */
+.ptitle { padding: 40px 24px 0; }
+.ptitle .back { font: 400 12px/1 var(--mono); color: var(--m); }
+.ptitle .back:hover { color: var(--f); }
+.ptitle h1 { margin: 28px 0 0; font: 500 clamp(34px, 9vw, 150px)/.92 var(--mono); overflow-wrap: anywhere; hyphens: auto; letter-spacing: -.06em; text-transform: lowercase; color: var(--f); max-width: 14ch; }
+.concept { display: inline-block; margin-top: 18px; }
+.pmeta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 28px 24px; margin-top: 40px; border-top: 1px solid var(--ln); border-bottom: 1px solid var(--ln); }
+.pmeta div { font: 400 12px/1.5 var(--mono); color: var(--m); }
+.pmeta b { display: block; font-weight: 400; color: var(--i); margin-top: 4px; }
+.pbody { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding: 48px 24px 80px; }
+.theses { grid-column: 1 / 5; display: flex; flex-direction: column; gap: 40px; }
+.theses .n { font: 400 13px/1 var(--mono); color: var(--m); }
+.theses h3 { font: 500 20px/1.2 var(--mono); letter-spacing: -.04em; text-transform: lowercase; margin: 12px 0 8px; color: var(--f); }
+.theses p { margin: 0; color: var(--t); }
+.next { font: 400 12px/1.4 var(--mono); color: var(--m); }
+.next a:hover { color: var(--f); }
+.pgal { grid-column: 6 / 13; display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; align-content: start; }
+.pgal figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.pgal figcaption { font: 400 11px/1.3 var(--mono); color: var(--m); }
+
+/* ---------- телефон ---------- */
+@media (max-width: 900px) {
+  .top { grid-template-columns: 1fr; height: auto; }
+  .top > * { display: none; padding: 16px; border-left: 0; }
+  .top > :first-child, .top .tools { display: flex; }
+  .top > :first-child { justify-content: space-between; }
+  .top .tools { padding-top: 0; border-top: 0; }
+  .cols { grid-template-columns: 1fr; }
+  .col { border-left: 0; border-top: 1px solid var(--ln); padding: 24px 16px 36px; gap: 28px; }
+  .col:first-child { border-top: 0; }
+  .chead { display: block; }
+  .bottom { padding: 0 16px; }
+  .ptitle { padding: 28px 16px 0; }
+  .pmeta { grid-template-columns: 1fr 1fr; padding: 20px 16px; }
+  .pbody { grid-template-columns: 1fr; padding: 32px 16px 56px; }
+  .theses, .pgal { grid-column: 1 / -1; }
+  .pgal { grid-template-columns: 1fr; } .pgal figure { grid-column: auto !important; margin-top: 0 !important; }
+}

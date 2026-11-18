@@ -21,7 +21,7 @@
 
   if (C.draft) h.push('<div class="draft">черновик · тексты в работе</div>');
   h.push('<div class="wrap">');
-  h.push('<div class="bar"><a href="/">← viaspinosa.art</a>' +
+  h.push('<div class="bar"><a href="/spotted/">← раздел</a>' +
     '<span class="hide-m vswitch">cv: ' + ORDER.map(function (k) { return '<a' + (k === key ? ' class="on" aria-current="page"' : '') + ' href="' + href[k] + '">' + esc(C.versions[k].label) + '</a>'; }).join(" · ") + '</span>' +
     '<span class="st">● ' + tx(V.status) + '</span></div>');
 

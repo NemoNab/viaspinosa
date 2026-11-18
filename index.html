@@ -198,13 +198,14 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
     var v = get(k); if (v != null) el.textContent = nb(v);
   });
   document.querySelectorAll("[data-href]").forEach(function (el) { var v = get(el.dataset.href); if (safe(v)) el.href = v; });
+  var SECTION = { n: "/spotted/" };   /* разделы, которые уже открыты */
   document.querySelectorAll("[data-links]").forEach(function (box) {
     var p = S.people[box.dataset.links]; if (!p) return;
     box.textContent = "";
     function add(tag, text, href) { var a = document.createElement(tag); a.textContent = text; if (href) a.href = href; box.appendChild(a); }
     if (safe(p.write)) add("a", "написать ↗", p.write);
     if (safe(p.channel)) add("a", "канал ↗", p.channel);
-    add("span", "раздел\u00a0— скоро");
+    if (SECTION[box.dataset.links]) add("a", "раздел →", SECTION[box.dataset.links]); else add("span", "раздел\u00a0— скоро");
   });
 })();
 </script>
