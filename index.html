@@ -101,7 +101,10 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   .bar a, .bar button { color: var(--m); text-decoration: none; background: none; border: 0; padding: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
   .bar a:hover, .bar button:hover { color: var(--i); }
   .bar b { font-weight: 400; color: var(--i); }
+  .bar { min-height: 16px; }
   .bar .status { color: var(--i); }
+  .half.l .bar { justify-content: flex-end; }
+  .only-m { display: none; }
   .who { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 56px 0 48px; max-width: 560px; }
   .head { display: flex; flex-direction: column; gap: 20px; }
   .ava { width: 168px; height: 168px; border-radius: 50%; display: block; }
@@ -134,6 +137,9 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
     .name { font-size: clamp(30px, 9.6vw, 42px); }
     .desc { font-size: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .tags { display: none; }
+    .half.n .bar.bottom { display: none; }
+    .half.l .bar.bottom { justify-content: space-between; }
+    .only-m { display: inline; }
     .links a, .links span { padding: 8px 12px; }
   }
   @media (max-width: 760px) and (max-height: 700px) {
@@ -146,7 +152,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
 
 <main id="home" aria-label="Портфолио">
   <section class="half n grain-surface" aria-labelledby="n-name">
-    <div class="bar"><button type="button" id="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span class="status" data-k="status">● беру проекты</span></div>
+    <div class="bar top"><span class="status" data-k="status.n">● беру проекты</span></div>
     <div class="who">
       <div class="head">
         <canvas class="ava" data-side="n" width="336" height="336" aria-hidden="true"></canvas>
@@ -157,9 +163,10 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
       <div class="tags" data-k="n.tags">[PR] пиар и партнёрства · [Д] дизайн · [А] автоматизация</div>
       <div class="links" data-links="n"><a href="https://t.me/nemonab">написать ↗</a><a href="https://t.me/spottedword">канал ↗</a><span>раздел — скоро</span></div>
     </div>
+    <div class="bar bottom"><button type="button" class="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button></div>
   </section>
   <section class="half l grain-surface" aria-labelledby="l-name">
-    <div class="bar"><span></span><span>RU</span></div>
+    <div class="bar top"><span class="status" data-k="status.l" hidden></span></div>
     <div class="who">
       <div class="head">
         <canvas class="ava" data-side="l" width="336" height="336" aria-hidden="true"></canvas>
@@ -170,6 +177,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
       <div class="tags" data-k="l.tags">анимация · рисунок · живопись · скульптура · гравюра</div>
       <div class="links" data-links="l"><a href="https://t.me/strangejell_stuff">канал ↗</a><span>раздел — скоро</span></div>
     </div>
+    <div class="bar bottom"><button type="button" class="back only-m" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span>RU</span></div>
   </section>
 </main>
 
@@ -183,7 +191,10 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   function get(path) { return path.split(".").reduce(function (o, k) { return o && o[k]; }, S.people); }
   document.querySelectorAll("[data-k]").forEach(function (el) {
     var k = el.dataset.k;
-    if (k === "status") { el.hidden = !(S.status && S.status.on); el.textContent = "● " + ((S.status && S.status.text) || ""); return; }
+    if (k.indexOf("status.") === 0) {
+      var st = S.status || {}; if ("on" in st) st = { n: st };   /* старый формат: один общий статус */
+      st = st[k.slice(7)] || {}; el.hidden = !(st.on && st.text); el.textContent = "● " + nb(st.text || ""); return;
+    }
     var v = get(k); if (v != null) el.textContent = nb(v);
   });
   document.querySelectorAll("[data-href]").forEach(function (el) { var v = get(el.dataset.href); if (safe(v)) el.href = v; });
@@ -231,7 +242,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   intro.addEventListener("touchmove", leave, { passive: true });
   addEventListener("keydown", function (e) { if (!intro.classList.contains("out") && !e.metaKey && !e.ctrlKey && !e.altKey) leave(); });
   document.getElementById("enter").addEventListener("click", leave);
-  document.getElementById("back").addEventListener("click", back);
+  document.querySelectorAll(".back").forEach(function (b) { b.addEventListener("click", back); });
 })();
 
 /* ---------- аватары: однобитное зерно в цветах своей половины ----------

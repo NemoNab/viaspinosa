@@ -73,8 +73,14 @@
   <section>
     <h2>Статус</h2>
     <div class="row">
-      <label class="check"><input type="checkbox" id="st-on"><span>показывать</span></label>
-      <label style="flex:1;min-width:220px"><span>текст</span><input type="text" id="st-text" placeholder="беру проекты"></label>
+      <span class="mono" style="width:56px">Сергей</span>
+      <label class="check"><input type="checkbox" id="st-n-on"><span>показывать</span></label>
+      <label style="flex:1;min-width:220px"><span>текст</span><input type="text" id="st-n-text" placeholder="беру проекты" maxlength="60"></label>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <span class="mono" style="width:56px">Лиза</span>
+      <label class="check"><input type="checkbox" id="st-l-on"><span>показывать</span></label>
+      <label style="flex:1;min-width:220px"><span>текст</span><input type="text" id="st-l-text" placeholder="беру проекты" maxlength="60"></label>
     </div>
   </section>
 
@@ -120,7 +126,12 @@
   function load() {
     var s = document.createElement("script");
     s.src = "/config.js?t=" + Date.now();
-    s.onload = function () { cfg = JSON.parse(JSON.stringify(window.SITE)); render(); };
+    s.onload = function () {
+      cfg = JSON.parse(JSON.stringify(window.SITE));
+      var st = cfg.status || {}; if ("on" in st) st = { n: st };
+      cfg.status = { n: st.n || { on: false, text: "" }, l: st.l || { on: false, text: "" } };
+      render();
+    };
     s.onerror = function () { msg("не удалось загрузить config.js", "err"); };
     document.head.appendChild(s);
   }
@@ -128,8 +139,7 @@
   function swatch(p) { return '<span class="sw" style="background:' + p.bg + '"><i style="background:' + p.fg + '"></i><b style="opacity:' + p.grain + '"></b></span>'; }
 
   function render() {
-    $("st-on").checked = !!(cfg.status && cfg.status.on);
-    $("st-text").value = (cfg.status && cfg.status.text) || "";
+    ["n","l"].forEach(function (k) { $("st-" + k + "-on").checked = !!cfg.status[k].on; $("st-" + k + "-text").value = cfg.status[k].text || ""; });
     $("endpoint").value = (cfg.panel && cfg.panel.endpoint) || "";
     var tb = $("pal"); tb.textContent = "";
     cfg.palettes.forEach(function (p, i) {
@@ -176,8 +186,10 @@
     });
   }
 
-  $("st-on").onchange = function () { cfg.status.on = this.checked; };
-  $("st-text").oninput = function () { cfg.status.text = this.value; };
+  ["n","l"].forEach(function (k) {
+    $("st-" + k + "-on").onchange = function () { cfg.status[k].on = this.checked; };
+    $("st-" + k + "-text").oninput = function () { cfg.status[k].text = this.value; };
+  });
   $("endpoint").oninput = function () { cfg.panel = cfg.panel || {}; cfg.panel.endpoint = this.value.trim(); };
   $("add-pal").onclick = function () { cfg.palettes.push({ name: "новая", by: "n", bg: "#00030a", fg: "#f2f0ea", grain: 0.2, on: false }); render(); };
   $("reset").onclick = function () { cfg = JSON.parse(JSON.stringify(window.SITE)); render(); msg("правки отменены"); };

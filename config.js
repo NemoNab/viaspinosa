@@ -3,8 +3,8 @@ window.SITE = {
   "version": 1,
   "updated": "2026-11-17T18:45:36.962Z",
   "status": {
-    "on": true,
-    "text": "беру проекты"
+    "n": { "on": true, "text": "беру проекты" },
+    "l": { "on": false, "text": "" }
   },
   "palettes": [
     {

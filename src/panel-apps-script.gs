@@ -59,6 +59,8 @@ function clean_(c) {
   if (!pals.length || pals.length > 20) throw new Error('палитр должно быть от 1 до 20');
   if (!pals.some(function (p) { return p.on; })) throw new Error('включи хотя бы одну палитру');
 
+  var st = c.status || {}; if ('on' in st) st = { n: st };   // старый формат: один общий статус
+  function stat(x) { x = x || {}; return { on: !!x.on, text: str(x.text, 60) }; }
   function person(p) {
     p = p || {};
     return { name: str(p.name, 60), city: str(p.city, 80), desc: str(p.desc, 400), tags: str(p.tags, 200), write: url(p.write), channel: url(p.channel) };
@@ -66,7 +68,7 @@ function clean_(c) {
   return {
     version: 1,
     updated: new Date().toISOString(),
-    status: { on: !!(c.status && c.status.on), text: str(c.status && c.status.text, 60) },
+    status: { n: stat(st.n), l: stat(st.l) },
     palettes: pals,
     people: { n: person(c.people && c.people.n), l: person(c.people && c.people.l) },
     panel: { endpoint: url(c.panel && c.panel.endpoint) }
@@ -103,7 +105,7 @@ function log_(cfg, commit) {
   var ss = SpreadsheetApp.getActiveSpreadsheet(); if (!ss) return;
   var sh = ss.getSheetByName('история') || ss.insertSheet('история');
   if (sh.getLastRow() === 0) sh.appendRow(['когда', 'статус', 'включённые палитры', 'коммит', 'настройки целиком']);
-  sh.appendRow([new Date(), (cfg.status.on ? '● ' : '○ ') + cfg.status.text,
+  sh.appendRow([new Date(), ['n', 'l'].map(function (k) { var x = cfg.status[k]; return (x.on ? '● ' : '○ ') + x.text; }).join(' / '),
     cfg.palettes.filter(function (p) { return p.on; }).map(function (p) { return p.name; }).join(', '),
     commit, JSON.stringify(cfg)]);
 }
