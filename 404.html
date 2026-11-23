@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Нет такой страницы · viaspinosa.art</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/assets/grain.css">
+<style>
+  :root { --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif; --bg: #00030a; --f: #f2f0ea; --m: #8b8880; --g-img: url(/assets/grain.png); --g-a: .3; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--f); font: 16px/1.5 var(--sans); }
+  .nf { min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; box-sizing: border-box; position: relative; }
+  .nf::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: var(--g-img); opacity: var(--g-a); }
+  .k { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); }
+  h1 { margin: 0; font: 500 clamp(72px, 16vw, 260px)/.85 var(--mono); letter-spacing: -.06em; }
+  p { max-width: 30em; color: var(--m); }
+  nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  nav a { font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--f); text-decoration: none; border: 1px solid #2c3039; border-radius: 99px; padding: 10px 14px; }
+  nav a:hover { border-color: var(--f); }
+</style>
+<script>
+/* Проект или работу добавили через пульт, а короткий адрес ещё не собран:
+   открываем страницу проекта прямо отсюда, без пересборки. */
+(function () {
+  var m = location.pathname.match(/^\/(spotted|strangejell)\/([a-z0-9][a-z0-9-]*)\/?$/);
+  if (!m || ["cv", "p", "w", "demo", "assets"].indexOf(m[2]) >= 0) return;
+  window.__route = { section: m[1], id: m[2] };
+})();
+</script>
+</head>
+<body>
+<div class="nf" id="nf">
+  <span class="k">viaspinosa.art</span>
+  <div><h1>404</h1><p id="t">Такой страницы нет. Возможно, её переименовали, или в адресе опечатка.</p></div>
+  <nav id="nv"><a href="/">на главную</a><a href="/spotted/">Сергей Потапов</a><a href="/strangejell/">Лиза Конышева</a></nav>
+</div>
+<script>
+try { if ((new URLSearchParams(location.search).get("lang") || localStorage.getItem("lang")) === "en") { document.documentElement.lang = "en"; document.getElementById("t").textContent = "No such page. It may have been renamed, or there is a typo in the address."; var a = document.querySelectorAll("#nv a"); a[0].textContent = "home"; a[1].textContent = "Sergey Potapov"; a[2].textContent = "Liza Konysheva"; } } catch (e) {}
+</script>
+<script>
+(function () {
+  var R = window.__route; if (!R) return;
+  var cfg = R.section === "spotted"
+    ? { css: "/spotted/spotted.css", data: "/spotted/projects.js", js: "/spotted/spotted.js", page: "project", list: function () { return window.PROJECTS || []; } }
+    : { css: "/strangejell/strangejell.css", data: "/strangejell/data.js", js: "/strangejell/strangejell.js", page: "work", list: function () { return (window.LIZA || {}).works || []; } };
+  function load(src) { return new Promise(function (ok, no) { var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  load("/config.js").then(function () { return load("/assets/site.js"); }).then(function () { return load(cfg.data); }).then(function () {
+    var found = cfg.list().some(function (x) { return x.id === R.id; });
+    if (!found) return;
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = cfg.css; document.head.appendChild(l);
+    document.body.innerHTML = '<div class="gfix grain-surface" aria-hidden="true"></div><main id="app"></main>';
+    document.body.setAttribute("data-page", cfg.page); document.body.setAttribute("data-id", R.id);
+    return load(cfg.js).then(function () { return load("/assets/links.js"); });
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>
