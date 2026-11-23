@@ -33,7 +33,7 @@
     ["d", "pr", "a"].forEach(function (k) {
       h.push('<div class="col" id="' + k + '"><div class="meta chead">' + esc(CATS[k]) + '</div>');
       P.filter(function (p) { return p.cat === k; }).forEach(function (p) {
-        h.push('<a class="entry" href="' + url(p) + '">' + (p.ph ? ph(p.ph) : '') +
+        h.push('<a class="entry" href="' + url(p) + '">' + (p.cover || p.ph ? V.img(p.cover, p.ph, p.title) : '') +
           '<div class="meta"><i>' + tx(p.title) + '</i>' + (p.year ? ' / ' + esc(p.year) : '') + '</div>' +
           '<p>' + tx(p.line) + '</p><span class="tag">' + esc(p.tags || "") + '</span></a>');
       });
@@ -67,10 +67,12 @@
       g.push('<div><div class="n">0' + (n + 1) + '</div><h3>' + esc(UI(t[0])) + '</h3><p>' + tx(t[1] || "[текст]") + '</p></div>');
     });
     g.push('<div class="next">' + esc(UI("следующий проект")) + ': <a href="' + url(nx) + '">' + tx(nx.title) + ' →</a></div></div>');
-    g.push('<div class="pgal">' +
-      '<figure style="grid-column:1/7">' + ph("3:2", "главная картинка 3:2") + '<figcaption>' + tx('[подпись]') + '</figcaption></figure>' +
-      '<figure style="grid-column:1/4;margin-top:80px">' + ph("3:4", "картинка 3:4") + '<figcaption>' + tx('[подпись]') + '</figcaption></figure>' +
-      '<figure style="grid-column:4/7">' + ph("1:1", "картинка 1:1") + '<figcaption>' + tx('[подпись]') + '</figcaption></figure></div></div>');
+    /* галерея: p.images = [{ src, ratio, cap }]; пока картинок нет — три плашки */
+    var imgs = p.images && p.images.length ? p.images : [{ ratio: "3:2", label: "главная картинка 3:2" }, { ratio: "3:4", label: "картинка 3:4" }, { ratio: "1:1", label: "картинка 1:1" }];
+    var place = ["grid-column:1/7", "grid-column:1/4;margin-top:80px", "grid-column:4/7"];
+    g.push('<div class="pgal">' + imgs.map(function (m, n) {
+      return '<figure style="' + (place[n % 3]) + '">' + V.img(m.src, m.ratio, m.cap, m.label) + '<figcaption>' + tx(m.cap || '[подпись]') + '</figcaption></figure>';
+    }).join("") + '</div></div>');
     g.push('<div class="bottom"><a href="/spotted/">← ' + esc(UI("все проекты")) + '</a><span>viaspinosa.art / spotted</span><a href="' + url(nx) + '">дальше →</a></div>');
     root.innerHTML = g.join("");
   }

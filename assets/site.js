@@ -79,5 +79,15 @@
   }
   function UI(s) { return lang === "en" && D[s] ? D[s] : s; }
 
-  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI, person: person, status: status };
+  /* картинка из tools/images.py: src без размера и расширения, например "/assets/img/spotted/veranda/01".
+     Пока картинки нет, рисуется серая плашка нужной пропорции с подписью. */
+  function img(src, ratio, alt, label) {
+    var ar = String(ratio || "4:3").replace(":", "/");
+    if (!src || typeof src !== "string" || !/^\/assets\/img\/[\w\/.-]+$/.test(src))
+      return '<div class="ph" style="aspect-ratio:' + esc(ar) + '">' + esc(label || ratio || "") + '</div>';
+    return '<img class="pic" src="' + src + '-800.webp" srcset="' + src + '-800.webp 800w, ' + src + '-1600.webp 1600w" sizes="(max-width: 900px) 100vw, 50vw"' +
+      ' alt="' + esc(nb(pick(alt)).replace(/[\[\]]/g, "")) + '" loading="lazy" decoding="async" style="aspect-ratio:' + esc(ar) + '">';
+  }
+
+  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI, person: person, status: status, img: img };
 })();

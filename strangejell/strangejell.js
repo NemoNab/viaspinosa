@@ -64,14 +64,14 @@
     if (kinds.length > 1) h.push('<div class="filters"><button class="on" data-kind="">все</button>' + kinds.map(function (k) { return '<button data-kind="' + esc(k) + '">' + tx(k) + '</button>'; }).join("") + '</div>');
     h.push('<div class="grid">');
     (L.works || []).forEach(function (w) {
-      h.push('<a class="work" data-kind="' + esc(w.kind) + '" href="' + wurl(w) + '">' + ph(w.ph, w.kind) +
+      h.push('<a class="work" data-kind="' + esc(w.kind) + '" href="' + wurl(w) + '">' + V.img(w.cover, w.ph, w.title, w.kind) +
         '<div class="mono">' + tx(w.kind) + (w.year ? ' · ' + esc(w.year) : '') + '</div><h3>' + tx(w.title) + '</h3><p>' + tx(w.line) + '</p></a>');
     });
     h.push('</div></section>');
 
     /* серии */
     h.push('<section id="series"><span class="k">' + esc(UI("личные серии")) + '</span><div class="two">');
-    (L.series || []).forEach(function (s) { h.push('<div class="work">' + ph(s.ph, s.kind) + '<h3>' + tx(s.title) + '</h3><p>' + tx(s.text) + '</p></div>'); });
+    (L.series || []).forEach(function (s) { h.push('<div class="work">' + V.img(s.cover, s.ph, s.title, s.kind) + '<h3>' + tx(s.title) + '</h3><p>' + tx(s.text) + '</p></div>'); });
     h.push('</div></section>');
 
     /* обо мне */
@@ -104,8 +104,9 @@
     g.push('<div class="wtitle"><a class="mono" href="' + BASE + '#works">← ' + esc(UI("все работы")) + '</a><h1>' + tx(w.title) + '</h1></div>');
     g.push('<div class="wmeta"><div>' + esc(UI("Год")) + '<b>' + tx(w.year || "[год]") + '</b></div><div>' + esc(UI("Роль")) + '<b>' + tx(w.role) + '</b></div><div>для кого<b>' + tx(w.client) + '</b></div><div>' + esc(UI("Направление")) + '<b>' + tx(w.kind) + '</b></div></div>');
     g.push('<div class="wbody"><div><p>' + tx(w.text || w.line) + '</p><p class="mono" style="margin-top:32px">' + esc(UI("дальше")) + ': <a href="' + wurl(nx) + '">' + tx(nx.title) + ' →</a></p></div>' +
-      '<div class="wgal"><figure>' + ph(w.ph, "главный кадр " + (w.ph || "")) + '<figcaption>' + tx("[подпись]") + '</figcaption></figure>' +
-      '<figure>' + ph("16:9", "раскадровка или скетч") + '<figcaption>' + tx("[подпись]") + '</figcaption></figure></div></div></div>');
+      '<div class="wgal">' + (w.images && w.images.length ? w.images : [{ ratio: w.ph, label: "главный кадр " + (w.ph || "") }, { ratio: "16:9", label: "раскадровка или скетч" }]).map(function (m) {
+        return '<figure>' + V.img(m.src, m.ratio, m.cap, m.label) + '<figcaption>' + tx(m.cap || "[подпись]") + '</figcaption></figure>';
+      }).join("") + '</div></div></div>');
     g.push(foot());
     root.innerHTML = g.join("");
   }

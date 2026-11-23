@@ -85,3 +85,4 @@ a.entry:hover h3, a.entry:hover .meta i { color: var(--f); text-decoration: unde
 }
 
 .lang a { color: var(--m); } .lang a:hover { color: var(--f); } .lang b { font-weight: 400; color: var(--i); }
+.pic { display: block; width: 100%; height: auto; object-fit: cover; background: var(--ph); }
