@@ -1,0 +1,69 @@
+/* Общие функции для всех страниц: типографика, экранирование, проверка ссылок, языки.
+   Подключается до скриптов страниц: <script src="/assets/site.js"></script> */
+(function () {
+  var SHORT = /(^|[\s(«])([А-Яа-яЁёA-Za-z]{1,2}|без|для|над|под|при|про|что|как|или|это|все|так) (?=\S)/g;
+
+  /* ---------- язык ----------
+     ?lang=en в адресе или выбор в переключателе (запоминается в браузере).
+     Текст в данных может быть строкой (русский) или объектом { ru: "...", en: "..." }.
+     Если английского нет, показывается русский. */
+  var lang = "ru";
+  try {
+    var q = (location.search.match(/[?&]lang=(ru|en)\b/) || [])[1];
+    if (q) { lang = q; localStorage.setItem("lang", q); }
+    else lang = localStorage.getItem("lang") || "ru";
+  } catch (e) {}
+  if (lang !== "en") lang = "ru";
+  document.documentElement.lang = lang;
+
+  function pick(v) {
+    if (v && typeof v === "object" && !Array.isArray(v)) return v[lang] != null && v[lang] !== "" ? v[lang] : (v.ru != null ? v.ru : "");
+    return v == null ? "" : v;
+  }
+  function nb(t) {
+    t = String(t == null ? "" : t);
+    if (lang === "ru") { t = t.replace(/ (—|–)/g, " $1"); var p; do { p = t; t = t.replace(SHORT, "$1$2 "); } while (p !== t); }
+    return t;
+  }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  /* текст для вывода: язык + типографика + заглушки [в скобках] подчёркнуты пунктиром.
+     Метки направлений вроде [PR] [Д] [А] остаются как есть. */
+  function tx(v) {
+    return esc(nb(pick(v))).replace(/\[([^\]]*)\]/g, function (m, x) {
+      return /^(PR|Д|А|Т)$/.test(x) ? m : '<span class="ph-t">' + x + '</span>';
+    });
+  }
+  function safe(u) { return typeof u === "string" && /^(https?:|mailto:|tg:)/i.test(u); }
+  function setLang(l) {
+    try { localStorage.setItem("lang", l); } catch (e) {}
+    var u = location.pathname + location.search.replace(/([?&])lang=(ru|en)&?/, "$1").replace(/[?&]$/, "") + location.hash;
+    location.href = u;
+  }
+  /* кнопка RU / EN: <span data-lang-switch></span> */
+  function langSwitch() {
+    return '<span class="lang">' + ["ru", "en"].map(function (l) {
+      return l === lang ? '<b>' + l.toUpperCase() + '</b>' : '<a href="#" data-set-lang="' + l + '">' + l.toUpperCase() + '</a>';
+    }).join(" / ") + '</span>';
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("[data-set-lang]");
+    if (a) { e.preventDefault(); setLang(a.getAttribute("data-set-lang")); }
+  });
+  /* подписи интерфейса: UI("написать") */
+  var D = {
+    "написать": "write", "канал": "channel", "раздел": "section", "скоро": "soon", "все проекты": "all projects",
+    "все работы": "all works", "следующий проект": "next project", "дальше": "next", "Задача": "Task", "Что я сделал": "What I did",
+    "Результат": "Result", "Год": "Year", "Где": "Where", "Роль": "Role", "Направление": "Field", "Профиль": "Profile",
+    "Канал и контакты": "Channel and contacts", "Контакты": "Contacts", "проектов": "projects", "концепт, не внедрён": "concept, not implemented",
+    "черновик раздела · тексты и картинки в работе": "draft · texts and images in progress", "черновик · тексты в работе": "draft · texts in progress",
+    "работы": "works", "шоурил": "showreel", "обо мне": "about", "личные серии": "personal series", "купить работу": "buy a work",
+    "образование": "education", "опыт": "experience", "выставки и фестивали": "exhibitions and festivals", "программы и техники": "software and techniques",
+    "кейсы": "cases", "навыки": "skills", "задача": "task", "что сделал": "what I did", "результат": "result", "моё": "mine", "не моё": "not mine",
+    "обновлено": "updated", "скачать pdf ↓": "download pdf ↓", "такого проекта нет": "no such project", "демо": "demo",
+    "Дизайн": "Design", "PR и проекты": "PR and projects", "Штуки": "Tools", "операционка и автоматизация": "operations and automation",
+    "пиар и проекты": "PR and projects", "раздел →": "section →", "раздел — скоро": "section — soon", "назад": "back"
+  };
+  function UI(s) { return lang === "en" && D[s] ? D[s] : s; }
+
+  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI };
+})();

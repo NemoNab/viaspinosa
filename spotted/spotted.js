@@ -10,7 +10,7 @@
   function tx(s) { return esc(nb(s)).replace(/\[([^\]]*)\]/g, function (m, x) { return /^(PR|Д|А|Т)$/.test(x) ? m : '<span class="ph-t">' + x + '</span>'; }); }
   function safe(u) { return typeof u === "string" && /^(https?:|mailto:|tg:)/i.test(u); }
   function ph(r, label, h) { return '<div class="ph" style="aspect-ratio:' + r.replace(":", "/") + (h ? ';height:' + h : '') + '">' + esc(label || r) + '</div>'; }
-  function url(p) { return "/spotted/p/?" + p.id; }
+  function url(p) { return "/spotted/" + p.id + "/"; }
   var status = (S.status && (S.status.n || S.status)) || {};
 
   function top(active) {
@@ -56,7 +56,7 @@
 
   /* ---------- страница проекта ---------- */
   if (page === "project") {
-    var id = decodeURIComponent(location.search.replace(/^\?/, "").split("&")[0]);
+    var id = document.body.getAttribute("data-id") || decodeURIComponent(location.search.replace(/^\?/, "").split("&")[0]);
     var i = -1; P.forEach(function (p, n) { if (p.id === id) i = n; });
     if (i < 0) { root.innerHTML = draft + top("") + '<div class="ptitle"><a class="back" href="/spotted/">← все проекты</a><h1>такого проекта нет</h1></div>'; return; }
     var p = P[i], nx = P[(i + 1) % P.length];
