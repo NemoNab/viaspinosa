@@ -121,9 +121,24 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   .links span { color: var(--m); }
 
 
+  /* десктоп: общая сетка на обе половины — аватар, имя, город, описание и кнопки
+     стоят на одних горизонталях слева и справа; где текст короче, остаётся воздух */
+  @media (min-width: 761px) {
+    #home { --gap: 20px; grid-template-rows: auto minmax(56px, 1fr) auto auto auto auto auto minmax(48px, 1fr) auto; }
+    .half { display: grid; grid-row: 1 / -1; grid-template-rows: subgrid; row-gap: 0; }
+    .half.n { grid-column: 1; } .half.l { grid-column: 2; }
+    .half .bar.top { grid-row: 1; } .half .bar.bottom { grid-row: 9; align-self: end; }
+    .who { display: contents; }
+    .head { grid-row: 3; } .real { grid-row: 4; } .desc { grid-row: 5; } .tags { grid-row: 6; } .links { grid-row: 7; }
+    .head, .real, .desc, .tags, .links { align-self: start; }
+    .head, .real, .tags, .links { max-width: 560px; }
+    .real, .desc, .tags { margin-top: var(--gap); }
+    .links { margin-top: calc(var(--gap) + 4px); }
+  }
   /* невысокие экраны ноутбуков */
   @media (min-width: 761px) and (max-height: 820px) {
     .who { padding: 28px 0 24px; gap: 14px; }
+    #home { --gap: 14px; grid-template-rows: auto minmax(28px, 1fr) auto auto auto auto auto minmax(24px, 1fr) auto; }
     .ava { width: 112px; height: 112px; }
     .head { gap: 14px; }
     .name { font-size: clamp(44px, 5.4vw, 84px); }
