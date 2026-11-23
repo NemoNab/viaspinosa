@@ -8,17 +8,31 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/grain.css">
+<script src="/config.js"></script>
 <style>
-  :root { --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif; --bg: #00030a; --f: #f2f0ea; --m: #8b8880; --g-img: url(/assets/grain.png); --g-a: .3; }
+  :root { --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif; --bg: #00030a; --f: #f2f0ea; --m: #8b8880; --ln: #2c3039; --g-img: url(/assets/grain.png); --g-a: .3; }
   html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--f); font: 16px/1.5 var(--sans); }
-  .nf { min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; box-sizing: border-box; position: relative; }
-  .nf::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: var(--g-img); opacity: var(--g-a); }
+  .nf { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; box-sizing: border-box; position: relative; z-index: 1; }
+  .gr { position: fixed; inset: 0; pointer-events: none; background: var(--g-img); opacity: var(--g-a); z-index: 2; }
   .k { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); }
   h1 { margin: 0; font: 500 clamp(72px, 16vw, 260px)/.85 var(--mono); letter-spacing: -.06em; }
   p { max-width: 30em; color: var(--m); }
   nav { display: flex; gap: 8px; flex-wrap: wrap; }
-  nav a { font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--f); text-decoration: none; border: 1px solid #2c3039; border-radius: 99px; padding: 10px 14px; }
+  nav a { font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--f); text-decoration: none; border: 1px solid var(--ln); border-radius: 99px; padding: 10px 14px; }
   nav a:hover { border-color: var(--f); }
+  /* солнце со стартового экрана: справа на десктопе, сверху на телефоне */
+  #sun { display: block; opacity: 0; transition: opacity 1s ease; }
+  #sun.live { opacity: 1; }
+  @media (min-width: 900px) {
+    .nf { width: 50%; }
+    #sun { position: fixed; top: 0; right: 0; width: 50vw; height: 100vh; }
+    h1 { font-size: clamp(72px, 11vw, 200px); }
+  }
+  @media (max-width: 899px) {
+    .nf { padding-top: 0; }
+    .nf > .k { order: -2; padding-top: 24px; }
+    #sun { width: calc(100% + 48px); margin: 0 -24px; height: 42vh; height: 42svh; order: -1; }
+  }
 </style>
 <script>
 /* Проект или работу добавили через пульт, а короткий адрес ещё не собран:
@@ -31,11 +45,33 @@
 </script>
 </head>
 <body>
+<div class="gr" aria-hidden="true"></div>
 <div class="nf" id="nf">
   <span class="k">viaspinosa.art</span>
+  <canvas id="sun" aria-hidden="true"></canvas>
   <div><h1>404</h1><p id="t">Такой страницы нет. Возможно, её переименовали, или в адресе опечатка.</p></div>
   <nav id="nv"><a href="/">на главную</a><a href="/spotted/">Сергей Потапов</a><a href="/strangejell/">Лиза Конышева</a></nav>
 </div>
+<script>
+/* случайная включённая палитра, как на стартовом экране */
+(function () {
+  var P = ((window.SITE && window.SITE.palettes) || []).filter(function (p) { return p.on !== false; });
+  var pal = P.length ? P[Math.floor(Math.random() * P.length)] : { bg: "#00030a", fg: "#f2f0ea", grain: .3 };
+  var h = pal.bg.slice(1), light = (parseInt(h.slice(0,2),16)*.299 + parseInt(h.slice(2,4),16)*.587 + parseInt(h.slice(4,6),16)*.114) / 255 > .5;
+  var r = document.documentElement.style;
+  r.setProperty("--bg", pal.bg); r.setProperty("--f", light ? "#1c1a16" : "#e9e6df");
+  r.setProperty("--m", light ? "#6f6a5f" : "#8b8880"); r.setProperty("--ln", light ? "rgba(28,26,22,.2)" : "rgba(233,230,223,.18)");
+  r.setProperty("--g-a", String(pal.grain == null ? .3 : pal.grain));
+  window.__pal = pal;
+})();
+</script>
+<script type="module">
+import("/assets/sun.min.js").then(function (m) {
+  var c = document.getElementById("sun");
+  if (!c || window.__routed) return;
+  window.SUN = m.startSun(c, window.__pal, function () { c.classList.add("live"); });
+}).catch(function () {});
+</script>
 <script>
 try { if ((new URLSearchParams(location.search).get("lang") || localStorage.getItem("lang")) === "en") { document.documentElement.lang = "en"; document.getElementById("t").textContent = "No such page. It may have been renamed, or there is a typo in the address."; var a = document.querySelectorAll("#nv a"); a[0].textContent = "home"; a[1].textContent = "Sergey Potapov"; a[2].textContent = "Liza Konysheva"; } } catch (e) {}
 </script>
@@ -46,9 +82,10 @@ try { if ((new URLSearchParams(location.search).get("lang") || localStorage.getI
     ? { css: "/spotted/spotted.css", data: "/spotted/projects.js", js: "/spotted/spotted.js", page: "project", list: function () { return window.PROJECTS || []; } }
     : { css: "/strangejell/strangejell.css", data: "/strangejell/data.js", js: "/strangejell/strangejell.js", page: "work", list: function () { return (window.LIZA || {}).works || []; } };
   function load(src) { return new Promise(function (ok, no) { var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
-  load("/config.js").then(function () { return load("/assets/site.js"); }).then(function () { return load(cfg.data); }).then(function () {
+  load("/assets/site.js").then(function () { return load(cfg.data); }).then(function () {
     var found = cfg.list().some(function (x) { return x.id === R.id; });
     if (!found) return;
+    window.__routed = true; if (window.SUN) window.SUN.pause();
     var l = document.createElement("link"); l.rel = "stylesheet"; l.href = cfg.css; document.head.appendChild(l);
     document.body.innerHTML = '<div class="gfix grain-surface" aria-hidden="true"></div><main id="app"></main>';
     document.body.setAttribute("data-page", cfg.page); document.body.setAttribute("data-id", R.id);
