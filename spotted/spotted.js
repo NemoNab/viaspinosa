@@ -35,7 +35,7 @@
       P.filter(function (p) { return p.cat === k; }).forEach(function (p) {
         h.push('<a class="entry" href="' + url(p) + '">' + (p.cover || p.ph ? V.img(p.cover, p.ph, p.title) : '') +
           '<div class="meta"><i>' + tx(p.title) + '</i>' + (p.year ? ' / ' + esc(p.year) : '') + '</div>' +
-          '<p>' + tx(p.line) + '</p><span class="tag">' + esc(p.tags || "") + '</span></a>');
+          '<p>' + tx(p.line) + '</p><span class="tag">' + esc(p.tags || "") + (p.demo ? ' · <b class="demo-tag">' + esc(UI("демо")) + '</b>' : '') + '</span></a>');
       });
       h.push('</div>');
     });
@@ -59,7 +59,8 @@
     document.title = String(V.pick(p.title)).replace(/[\[\]]/g, "") + " · " + (me.name || "Сергей Потапов") + " · viaspinosa.art";
     var g = [draft, top(p.cat)];
     g.push('<div class="ptitle"><a class="back" href="/spotted/#' + p.cat + '">← ' + esc(UI("все проекты")) + '</a><h1>' + tx(p.title) + '</h1>' +
-      (p.concept ? '<span class="tag concept">' + esc(UI("концепт, не внедрён")) + '</span>' : '') + '</div>');
+      (p.concept ? '<span class="tag concept">' + esc(UI("концепт, не внедрён")) + '</span>' : '') +
+      (p.demo && /^\/spotted\/demo\//.test(p.demo) ? '<div class="pills" style="margin-top:22px"><a class="pill main" href="' + esc(p.demo) + '">' + esc(UI("демо")) + ' →</a></div>' : '') + '</div>');
     g.push('<div class="pmeta"><div>' + esc(UI("Год")) + '<b>' + tx(p.year || "[год]") + '</b></div><div>' + esc(UI("Где")) + '<b>' + tx(p.where || "[где]") + '</b></div>' +
       '<div>' + esc(UI("Роль")) + '<b>' + tx(p.role || "[роль]") + '</b></div><div>' + esc(UI("Направление")) + '<b>' + esc(p.tags || "") + '</b></div></div>');
     g.push('<div class="pbody"><div class="theses">');

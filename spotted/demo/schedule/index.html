@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Демо: генератор графика смен · Сергей Потапов</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/spotted/demo/demo.css">
+<script src="/assets/site.js"></script>
+<style>
+  .grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+  .set { display: flex; flex-direction: column; gap: 14px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cal { overflow-x: auto; }
+  .cal table { font-size: 13px; min-width: 760px; }
+  .cal th, .cal td { text-align: center; padding: 6px 4px; border-left: 1px solid var(--ln); }
+  .cal td:first-child, .cal th:first-child { text-align: left; white-space: nowrap; border-left: 0; padding-right: 10px; }
+  .cal .we { background: rgba(87,211,230,.06); }
+  .on { color: var(--bg); background: var(--f) !important; font-weight: 500; }
+  .off { color: #e88a7d; }
+  .short { color: #e88a7d; font-weight: 500; }
+  .tg { white-space: pre-wrap; font: 13px/1.5 var(--mono); color: var(--t); background: var(--fld); border-radius: 8px; padding: 14px; margin-top: 14px; }
+  .msgs { color: #e88a7d; font: 12px/1.5 var(--mono); margin-top: 10px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="top"><a href="/spotted/schedule/">← проект «График смен»</a><span class="note">демо · выдуманные сотрудники, всё считается в браузере</span></div>
+<div class="wrap">
+  <h1>график смен</h1>
+  <p class="lead">Настройки слева, график справа. Генератор следит, чтобы в зале каждый день было не меньше нужного числа людей, никто не работал дольше разрешённого подряд, пожелания по выходным соблюдались, а смены распределялись поровну. Готовый график можно отправить в Telegram: здесь показан текст сообщения.</p>
+  <div class="grid">
+    <div class="set panel">
+      <label><span>месяц</span><input type="month" id="month"></label>
+      <label><span>сотрудники, по одному в строке</span><textarea id="staff">Аня
+Борис
+Вика
+Гоша
+Дина
+Егор</textarea></label>
+      <div class="two">
+        <label><span>минимум в будни</span><input type="number" id="minWd" min="1" max="10" value="2"></label>
+        <label><span>минимум в выходные</span><input type="number" id="minWe" min="1" max="10" value="3"></label>
+      </div>
+      <label><span>не больше смен подряд</span><input type="number" id="maxRow" min="1" max="7" value="3"></label>
+      <label><span>пожелания: имя и дни выходных</span><textarea id="wish" style="min-height:80px">Аня: 8, 9
+Гоша: 14, 15, 16</textarea></label>
+      <button class="main" type="button" id="go">собрать график</button>
+    </div>
+    <div>
+      <div class="cal panel" id="cal"></div>
+      <div class="msgs" id="msgs"></div>
+      <div class="tg" id="tg"></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var now = new Date(); $("month").value = now.getFullYear() + "-" + String(now.getMonth() + 2 > 12 ? 1 : now.getMonth() + 2).padStart(2, "0");
+  if (now.getMonth() === 11) $("month").value = (now.getFullYear() + 1) + "-01";
+  var WD = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"], MON = ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"];
+
+  function build() {
+    var m = $("month").value.split("-"), y = +m[0], mo = +m[1] - 1, days = new Date(y, mo + 1, 0).getDate();
+    var staff = $("staff").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+    var minWd = +$("minWd").value || 1, minWe = +$("minWe").value || 1, maxRow = +$("maxRow").value || 1;
+    var off = {}; staff.forEach(function (s) { off[s] = {}; });
+    $("wish").value.split("\n").forEach(function (l) {
+      var p = l.split(":"); if (p.length < 2) return; var who = p[0].trim(); if (!off[who]) return;
+      p[1].split(/[ ,;]+/).forEach(function (d) { d = +d; if (d >= 1 && d <= days) off[who][d] = 1; });
+    });
+    var plan = {}, total = {}, row = {}, warn = [];
+    staff.forEach(function (s) { plan[s] = {}; total[s] = 0; row[s] = 0; });
+    for (var d = 1; d <= days; d++) {
+      var dow = new Date(y, mo, d).getDay(), we = dow === 0 || dow === 6, need = Math.min(we ? minWe : minWd, staff.length);
+      /* кандидаты: не в выходном по пожеланию и не упёрлись в лимит подряд; первыми те, у кого меньше смен */
+      var cand = staff.filter(function (s) { return !off[s][d] && row[s] < maxRow; })
+        .sort(function (a, b) { return total[a] - total[b] || row[a] - row[b] || (a < b ? -1 : 1); });
+      var pick = cand.slice(0, need);
+      if (pick.length < need) warn.push(d + " " + MON[mo].slice(0, 3) + ": не хватает людей (" + pick.length + " из " + need + ")");
+      staff.forEach(function (s) {
+        var on = pick.indexOf(s) >= 0; plan[s][d] = on;
+        if (on) { total[s]++; row[s]++; } else row[s] = 0;
+      });
+      plan._need = plan._need || {}; plan._need[d] = need; plan._have = plan._have || {}; plan._have[d] = pick.length;
+    }
+    /* таблица */
+    var h = '<table><thead><tr><th>' + MON[mo] + ' ' + y + '</th>';
+    for (d = 1; d <= days; d++) { var w = new Date(y, mo, d).getDay(); h += '<th class="' + (w === 0 || w === 6 ? "we" : "") + '">' + d + '<br>' + WD[w] + '</th>'; }
+    h += '<th>смен</th></tr></thead><tbody>';
+    staff.forEach(function (s) {
+      h += '<tr><td>' + s.replace(/</g, "&lt;") + '</td>';
+      for (d = 1; d <= days; d++) { var w2 = new Date(y, mo, d).getDay(), cls = (w2 === 0 || w2 === 6 ? "we " : "") + (plan[s][d] ? "on" : off[s][d] ? "off" : ""); h += '<td class="' + cls + '">' + (plan[s][d] ? "●" : off[s][d] ? "в" : "") + '</td>'; }
+      h += '<td class="num">' + total[s] + '</td></tr>';
+    });
+    h += '<tr><td class="mono">в зале</td>';
+    for (d = 1; d <= days; d++) h += '<td class="' + (plan._have[d] < plan._need[d] ? "short" : "") + '">' + plan._have[d] + '</td>';
+    h += '<td></td></tr></tbody></table>';
+    $("cal").innerHTML = h;
+    $("msgs").textContent = warn.length ? "Внимание: " + warn.join("; ") : "";
+    /* текст для Telegram */
+    var t = "График на " + MON[mo] + " " + y + "\n\n";
+    staff.forEach(function (s) { var ds = []; for (var d2 = 1; d2 <= days; d2++) if (plan[s][d2]) ds.push(d2); t += s + " (" + ds.length + "): " + ds.join(", ") + "\n"; });
+    t += "\nВопросы и замены — в этот чат.";
+    $("tg").textContent = "Сообщение в Telegram:\n\n" + t;
+    V.typo($("msgs"));
+  }
+  $("go").onclick = build;
+  ["month", "minWd", "minWe", "maxRow"].forEach(function (id) { $(id).onchange = build; });
+  build();
+})();
+</script>
+<script>V.typo();</script>
+</body>
+</html>

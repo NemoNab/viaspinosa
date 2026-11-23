@@ -1,0 +1,26 @@
+/* Общие стили демо: тёмная палитра сайта. */
+:root { --mono: "JetBrains Mono", ui-monospace, monospace; --sans: "Onest", system-ui, sans-serif;
+        --bg: #00030a; --f: #f2f0ea; --i: #e9e6df; --t: #c9c6bf; --m: #8b8880; --ln: #1c1f26; --fld: #0b0e16; --acc: #57d3e6; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--i); font: 15px/1.45 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+.top { display: flex; justify-content: space-between; gap: 16px; padding: 18px 24px; border-bottom: 1px solid var(--ln); font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); }
+.top a { text-decoration: none; } .top a:hover { color: var(--f); }
+.note { color: var(--acc); }
+.wrap { padding: 28px 24px 64px; max-width: 1440px; margin: 0 auto; }
+h1 { margin: 0 0 8px; font: 500 clamp(36px, 5vw, 72px)/.95 var(--mono); letter-spacing: -.06em; text-transform: lowercase; color: var(--f); }
+.lead { max-width: 46em; color: var(--t); margin: 0 0 28px; }
+.mono, label span, th { font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); }
+label { display: flex; flex-direction: column; gap: 6px; }
+input, textarea, select { background: var(--fld); color: var(--i); border: 1px solid var(--ln); border-radius: 6px; padding: 8px 10px; font: 14px/1.4 var(--sans); width: 100%; }
+textarea { min-height: 120px; resize: vertical; }
+button { cursor: pointer; font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; background: none; color: var(--i); border: 1px solid #2c3039; border-radius: 99px; padding: 10px 14px; }
+button:hover { border-color: var(--f); color: var(--f); }
+button.main { background: var(--f); color: var(--bg); border-color: var(--f); }
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; font-weight: 400; padding: 6px 8px; border-bottom: 1px solid var(--ln); }
+td { padding: 6px 8px; border-bottom: 1px solid var(--ln); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.panel { border: 1px solid var(--ln); border-radius: 8px; padding: 16px; }
+.grid > *, .cols > *, .stack > * { min-width: 0; }
+.panel { overflow-x: auto; }

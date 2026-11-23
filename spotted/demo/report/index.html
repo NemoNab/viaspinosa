@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Демо: отчёт по продажам · Сергей Потапов</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/spotted/demo/demo.css">
+<script src="/assets/site.js"></script>
+<style>
+  .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi b { display: block; font: 500 30px/1.1 var(--mono); letter-spacing: -.04em; color: var(--f); margin-top: 6px; }
+  .cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start; }
+  .stack { display: flex; flex-direction: column; gap: 24px; }
+  .bar { height: 6px; background: var(--acc); border-radius: 3px; }
+  svg.spark { width: 100%; height: 70px; display: block; }
+  .search { display: flex; gap: 10px; margin-bottom: 14px; }
+  .hit td { color: var(--f); }
+  h3 { margin: 0 0 10px; font: 500 16px/1.2 var(--mono); letter-spacing: -.03em; text-transform: lowercase; color: var(--f); }
+  @media (max-width: 900px) { .kpi { grid-template-columns: 1fr 1fr; } .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="top"><a href="/spotted/reports/">← проект «Отчёты по продажам»</a><span class="note">демо · все цифры и заказы выдуманы</span></div>
+<div class="wrap">
+  <h1>отчёт по продажам</h1>
+  <p class="lead">Так устроена панель поверх таблицы заказов. В настоящей версии заказы каждый месяц выгружаются из Битрикса, скрипт сводит двенадцать месячных листов в одну плоскую базу, а панель считает срезы формулами. Здесь 1200 выдуманных заказов, всё считается в браузере.</p>
+  <div class="kpi" id="kpi"></div>
+  <div class="cols">
+    <div class="stack">
+      <div class="panel"><h3>по месяцам</h3><svg class="spark" id="spark" viewBox="0 0 600 70" preserveAspectRatio="none"></svg><table id="months"></table></div>
+      <div class="panel"><h3>поиск по книге</h3><div class="search"><input id="q" placeholder="начните вводить название"></div><table id="books"></table></div>
+    </div>
+    <div class="stack">
+      <div class="panel"><h3>города</h3><table id="cities"></table></div>
+      <div class="panel"><h3>доставка</h3><table id="deliv"></table></div>
+      <div class="panel"><h3>оплата</h3><table id="pay"></table></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  /* выдуманная база заказов с постоянным зерном случайности: при каждом открытии одна и та же */
+  var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  function pick(a, w) { var r = rnd() * w.reduce(function (s, x) { return s + x; }, 0); for (var i = 0; i < a.length; i++) { r -= w[i]; if (r <= 0) return a[i]; } return a[a.length - 1]; }
+  var BOOKS = ["Тихая библиотека", "Атлас несуществующих мест", "Сад камней", "Краткая история шрифта", "Город и его тени", "Письма о живописи", "Северный ветер", "Как читать комиксы", "Азбука кино", "Птицы Урала", "Дом на склоне", "Книга о бумаге"];
+  var CITIES = ["Екатеринбург", "Москва", "Санкт-Петербург", "Новосибирск", "Пермь", "Казань", "Челябинск", "Тюмень"];
+  var DELIV = ["самовывоз", "курьер по городу", "пункт выдачи", "почта"], PAY = ["картой на сайте", "СБП", "при получении"];
+  var MON = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+  var base = [];
+  for (var i = 0; i < 1200; i++) {
+    var m = pick([0,1,2,3,4,5,6,7,8,9,10,11], [6,6,7,7,6,5,5,6,8,9,11,16]);
+    var qty = pick([1, 2, 3], [7, 2, 1]), price = 600 + Math.round(rnd() * 28) * 50;
+    base.push({ m: m, book: pick(BOOKS, [9,4,6,3,5,2,4,7,3,2,3,2]), city: pick(CITIES, [40,22,10,5,6,4,8,5]), deliv: pick(DELIV, [30,20,35,15]), pay: pick(PAY, [55,35,10]), qty: qty, sum: qty * price });
+  }
+  var fmt = function (n) { return Math.round(n).toLocaleString("ru-RU"); };
+  function group(key) {
+    var g = {}; base.forEach(function (o) { var k = o[key]; g[k] = g[k] || { n: 0, sum: 0, qty: 0 }; g[k].n++; g[k].sum += o.sum; g[k].qty += o.qty; });
+    return Object.keys(g).map(function (k) { return { k: k, n: g[k].n, sum: g[k].sum, qty: g[k].qty }; }).sort(function (a, b) { return b.sum - a.sum; });
+  }
+  function table(id, rows, head, max) {
+    var top = rows[0] ? rows[0].sum : 1;
+    document.getElementById(id).innerHTML = '<tr><th>' + head + '</th><th class="num">заказов</th><th class="num">сумма, ₽</th><th style="width:30%"></th></tr>' +
+      rows.slice(0, max || 99).map(function (r) { return '<tr><td>' + r.k + '</td><td class="num">' + r.n + '</td><td class="num">' + fmt(r.sum) + '</td><td><div class="bar" style="width:' + (r.sum / top * 100) + '%"></div></td></tr>'; }).join("");
+  }
+  var total = base.reduce(function (s, o) { return s + o.sum; }, 0), qty = base.reduce(function (s, o) { return s + o.qty; }, 0);
+  document.getElementById("kpi").innerHTML = [["заказов", base.length], ["книг", qty], ["выручка, ₽", fmt(total)], ["средний чек, ₽", fmt(total / base.length)]]
+    .map(function (k) { return '<div class="panel"><span class="mono">' + k[0] + '</span><b>' + k[1] + '</b></div>'; }).join("");
+  /* месяцы и спарклайн */
+  var bym = MON.map(function (_, m) { return base.filter(function (o) { return o.m === m; }).reduce(function (s, o) { return s + o.sum; }, 0); });
+  var mx = Math.max.apply(null, bym), pts = bym.map(function (v, i) { return (i * 600 / 11).toFixed(1) + "," + (66 - v / mx * 60).toFixed(1); });
+  document.getElementById("spark").innerHTML = '<polyline fill="none" stroke="#57d3e6" stroke-width="2" points="' + pts.join(" ") + '"/>' + pts.map(function (p) { var c = p.split(","); return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="3" fill="#f2f0ea"/>'; }).join("");
+  document.getElementById("months").innerHTML = '<tr>' + MON.map(function (m) { return '<th class="num">' + m + '</th>'; }).join("") + '</tr><tr>' + bym.map(function (v) { return '<td class="num">' + Math.round(v / 1000) + 'к</td>'; }).join("") + '</tr>';
+  table("cities", group("city"), "город", 8); table("deliv", group("deliv"), "способ"); table("pay", group("pay"), "способ");
+  /* поиск по книге */
+  var books = group("book");
+  function search() {
+    var q = document.getElementById("q").value.trim().toLowerCase();
+    var rows = books.filter(function (b) { return !q || b.k.toLowerCase().indexOf(q) >= 0; });
+    table("books", rows.map(function (r) { return { k: r.k + ' <span class="mono">· ' + r.qty + ' шт</span>', n: r.n, sum: r.sum }; }), "книга", 12);
+  }
+  document.getElementById("q").oninput = search; search();
+})();
+</script>
+<script>V.typo();</script>
+</body>
+</html>

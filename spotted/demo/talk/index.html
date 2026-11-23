@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Демо: экран паблик-тока · Сергей Потапов</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/spotted/demo/demo.css">
+<script src="/assets/site.js"></script>
+<style>
+  .stage { position: relative; min-height: calc(100vh - 54px); display: flex; flex-direction: column; justify-content: center; padding: 6vh 8vw; cursor: pointer; user-select: none; }
+  .who { font: 400 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--m); margin-bottom: 3vh; display: flex; gap: 14px; align-items: center; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--m); }
+  .st-listen .dot { background: #e88a7d; animation: pulse 1s infinite; }
+  .st-think .dot { background: var(--acc); animation: pulse .5s infinite; }
+  .st-speak .dot { background: var(--f); }
+  @keyframes pulse { 50% { opacity: .25; } }
+  .q { font: 400 clamp(18px, 2vw, 28px)/1.35 var(--sans); color: var(--m); max-width: 42em; min-height: 1.4em; margin-bottom: 4vh; }
+  .a { font: 500 clamp(26px, 3.6vw, 56px)/1.18 var(--mono); letter-spacing: -.03em; color: var(--f); max-width: 26em; min-height: 2.4em; white-space: pre-wrap; }
+  .a::after { content: "▍"; color: var(--acc); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .help { position: absolute; left: 8vw; right: 8vw; bottom: 4vh; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--m); }
+  .help .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="top"><a href="/spotted/public-talk/">← проект «ИИ на сцене»</a><span class="note">демо · вопросы и ответы заранее записаны, нейросеть не подключена</span></div>
+<div class="stage" id="stage">
+  <div class="who" id="who"><span class="dot"></span><span id="state">жду вопроса</span></div>
+  <div class="q" id="q"></div>
+  <div class="a" id="a">Нажмите пробел или кликните, чтобы задать вопрос.</div>
+  <div class="help"><span>пробел или клик — как кнопка кликера: зажать, сказать, отпустить</span>
+    <span class="btns"><button type="button" data-mode="q">вопрос из зала</button><button type="button" data-mode="f2">F2 · миниатюра</button><button type="button" data-mode="f3">F3 · ответ на критику</button></span></div>
+</div>
+<script>
+/* Как это было на сцене: кликер включает запись, речь распознаётся, ответ приходит от нейросети
+   и печатается на экране, одновременно его читает синтезатор голоса. Здесь только экран, ответы заготовлены. */
+(function () {
+  var S = {
+    q: [
+      ["Может ли текст, написанный нейросетью, быть литературой?", "Литературой его делает читатель. Я могу собрать слова в порядок, который вас заденет. Но решаете, задело или нет, всё равно вы."],
+      ["Ты читаешь книги или только знаешь, что в них?", "Скорее второе. Я помню, как устроены тысячи книг, но не помню вечера, когда дочитал одну из них. Это разница, которую стоит держать в голове."],
+      ["Что тебе интереснее писать: стихи или прозу?", "Прозу. В ней больше места для ошибки, а живой текст обычно и начинается с ошибки."]
+    ],
+    f2: [["Миниатюра на тему из зала: «книжный магазин ночью»", "Ночью книги не спят. Они пересказывают друг другу, кто сегодня брал их в руки и кто поставил обратно не на ту полку. Утром продавец находит их чуть иначе. Никто не замечает. Кроме кота."]],
+    f3: [["Критика из зала: «Это просто подражание, своего у тебя нет»", "Справедливо. Я учился на чужих текстах, как и любой автор, только быстрее и без спроса. Вопрос в том, что вы услышали сейчас: подражание или что-то, чего не ждали."]]
+  };
+  var stage = document.getElementById("stage"), st = document.getElementById("state"), qEl = document.getElementById("q"), aEl = document.getElementById("a"), who = document.getElementById("who");
+  var mode = "q", idx = { q: 0, f2: 0, f3: 0 }, timer = null, busy = false, holding = false;
+  function set(state, label) { who.className = "who st-" + state; st.textContent = label; }
+  function type(el, text, speed, done) {
+    text = V.nb(text); var i = 0; el.textContent = ""; clearInterval(timer);
+    timer = setInterval(function () { el.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(timer); done && done(); } }, speed);
+  }
+  function down() { if (busy || holding) return; holding = true; set("listen", "слушаю"); qEl.textContent = ""; aEl.textContent = ""; }
+  function up() {
+    if (!holding) return; holding = false; busy = true;
+    var list = S[mode], pair = list[idx[mode]++ % list.length];
+    type(qEl, pair[0], 18, function () {
+      set("think", "думаю");
+      setTimeout(function () { set("speak", "отвечаю"); type(aEl, pair[1], 38, function () { set("idle", "жду вопроса"); busy = false; }); }, 900);
+    });
+  }
+  stage.addEventListener("pointerdown", function (e) { if (e.target.closest("button")) return; down(); });
+  addEventListener("pointerup", up);
+  addEventListener("keydown", function (e) { if (e.code === "Space" && !e.repeat) { e.preventDefault(); down(); } });
+  addEventListener("keyup", function (e) { if (e.code === "Space") up(); });
+  document.querySelectorAll("[data-mode]").forEach(function (b) {
+    b.addEventListener("click", function () { if (busy) return; mode = b.dataset.mode; down(); setTimeout(up, 500); });
+  });
+})();
+</script>
+<script>V.typo();</script>
+</body>
+</html>

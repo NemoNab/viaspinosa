@@ -23,7 +23,7 @@ window.PROJECTS = [
     line: "[подпись]", where: "Москва", role: "[роль]" },
   { id: "events", cat: "pr", title: "Ивенты магазина", year: "2023 — сейчас", tags: "[PR]",
     line: "[подпись]", where: "«Пиотровский»", role: "[роль]" },
-  { id: "public-talk", cat: "pr", title: "ИИ на сцене", year: "", ph: "3:2", tags: "[PR] [А]",
+  { id: "public-talk", demo: "/spotted/demo/talk/", cat: "pr", title: "ИИ на сцене", year: "", ph: "3:2", tags: "[PR] [А]",
     line: "[подпись]", role: "[роль]" },
 
   /* штуки */
@@ -33,13 +33,13 @@ window.PROJECTS = [
     line: "[подпись]", where: "«Пиотровский»", role: "архитектура пересчёта" },
   { id: "bypass", cat: "a", title: "Обходная схема 1С ↔ Битрикс", year: "2025 — сейчас", tags: "[А] процессы",
     line: "[подпись]", where: "«Пиотровский»", role: "[роль]" },
-  { id: "reports", cat: "a", title: "Отчёты по продажам", year: "2023 — сейчас", ph: "16:9", tags: "[А] Google Таблицы",
+  { id: "reports", demo: "/spotted/demo/report/", cat: "a", title: "Отчёты по продажам", year: "2023 — сейчас", ph: "16:9", tags: "[А] Google Таблицы",
     line: "[подпись]", where: "«Пиотровский»", role: "[роль]" },
   { id: "torg12-bot", cat: "a", title: "Бот для накладных", year: "", tags: "[А] Python · aiogram",
     line: "[подпись]", role: "[роль]" },
   { id: "isbn", cat: "a", title: "Книги по ISBN", year: "", tags: "[А] Apps Script",
     line: "[подпись]", role: "[роль]" },
-  { id: "schedule", cat: "a", title: "График смен", year: "", ph: "16:9", tags: "[А] концепт",
+  { id: "schedule", demo: "/spotted/demo/schedule/", cat: "a", title: "График смен", year: "", ph: "16:9", tags: "[А] концепт",
     line: "[подпись]", role: "[роль]", concept: true },
   { id: "reading-card", cat: "a", title: "Читательская карта", year: "", tags: "[А] концепт",
     line: "[подпись]", role: "[роль]", concept: true }

@@ -89,5 +89,13 @@
       ' alt="' + esc(nb(pick(alt)).replace(/[\[\]]/g, "")) + '" loading="lazy" decoding="async" style="aspect-ratio:' + esc(ar) + '">';
   }
 
-  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI, person: person, status: status, img: img };
+  /* типографика для готового текста на странице: пройти по всем текстовым узлам */
+  function typo(root) {
+    if (lang !== "ru") return;
+    var w = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT, { acceptNode: function (n) {
+      var p = n.parentNode && n.parentNode.nodeName; return p === "SCRIPT" || p === "STYLE" || p === "TEXTAREA" ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; } }), n;
+    while ((n = w.nextNode())) { var t = nb(n.nodeValue); if (t !== n.nodeValue) n.nodeValue = t; }
+  }
+
+  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI, person: person, status: status, img: img, typo: typo };
 })();
