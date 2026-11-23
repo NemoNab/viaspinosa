@@ -21,6 +21,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="modulepreload" href="/assets/sun.min.js">
 <script src="/config.js"></script>
+<script src="/assets/site.js"></script>
 <script>
 /* Палитры и тексты берутся из /config.js (его правит пульт /panel). Ниже — запасные значения,
    если config.js не загрузился. n — Наб, l — Лиза. Первый экран: случайная включённая палитра,
@@ -177,7 +178,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
       <div class="tags" data-k="l.tags">анимация · рисунок · живопись · скульптура · гравюра</div>
       <div class="links" data-links="l"><a href="https://t.me/strangejell_stuff">канал ↗</a><span>раздел — скоро</span></div>
     </div>
-    <div class="bar bottom"><button type="button" class="back only-m" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span>RU</span></div>
+    <div class="bar bottom"><button type="button" class="back only-m" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span data-lang-slot>RU</span></div>
   </section>
 </main>
 
@@ -188,34 +189,45 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   var SHORT = /(^|[\s(«])([А-Яа-яЁёA-Za-z]{1,2}|без|для|над|под|при|про|что|как|или|это|все|так) (?=\S)/g;
   function nb(t) { t = String(t || "").replace(/ (—|–)/g, "\u00a0$1").replace(/\] /g, "]\u00a0"); var p; do { p = t; t = t.replace(SHORT, "$1$2\u00a0"); } while (p !== t); return t; }
   function safe(u) { return typeof u === "string" && /^(https?:|mailto:|tg:)/i.test(u); }
-  function get(path) { return path.split(".").reduce(function (o, k) { return o && o[k]; }, S.people); }
+  /* английская версия: поля people.n.en.desc и так далее; если их нет, остаётся русский */
+  var EN = { n: { name: "Sergey Potapov", city: "Yekaterinburg → Almaty" }, l: { name: "Liza Konysheva", city: "Yekaterinburg → Almaty" } };
+  function get(path) {
+    var k = path.split("."), p = S.people && S.people[k[0]];
+    if (!p) return null;
+    if (V.lang === "en" && p.en && p.en[k[1]]) return p.en[k[1]];
+    if (V.lang === "en" && EN[k[0]] && EN[k[0]][k[1]]) return EN[k[0]][k[1]];
+    return p[k[1]];
+  }
   document.querySelectorAll("[data-k]").forEach(function (el) {
     var k = el.dataset.k;
     if (k.indexOf("status.") === 0) {
       var st = S.status || {}; if ("on" in st) st = { n: st };   /* старый формат: один общий статус */
-      st = st[k.slice(7)] || {}; el.hidden = !(st.on && st.text); el.textContent = "● " + nb(st.text || ""); return;
+      st = st[k.slice(7)] || {}; var stt = V.lang === "en" && st.en ? st.en : st.text;
+      el.hidden = !(st.on && stt); el.textContent = "● " + nb(stt || ""); return;
     }
-    var v = get(k); if (v != null) el.textContent = nb(v);
+    var v = get(k); if (v != null) el.textContent = V.lang === "en" ? v : nb(v);
   });
   document.querySelectorAll("[data-href]").forEach(function (el) { var v = get(el.dataset.href); if (safe(v)) el.href = v; });
-  var SECTION = { n: "/spotted/" };   /* разделы, которые уже открыты */
+  var SECTION = { n: "/spotted/", l: "/strangejell/" };   /* разделы, которые уже открыты */
   document.querySelectorAll("[data-links]").forEach(function (box) {
     var p = S.people[box.dataset.links]; if (!p) return;
     box.textContent = "";
     function add(tag, text, href) { var a = document.createElement(tag); a.textContent = text; if (href) a.href = href; box.appendChild(a); }
-    if (safe(p.write)) add("a", "написать ↗", p.write);
-    if (safe(p.channel)) add("a", "канал ↗", p.channel);
-    if (SECTION[box.dataset.links]) add("a", "раздел →", SECTION[box.dataset.links]); else add("span", "раздел\u00a0— скоро");
+    if (safe(p.write)) add("a", V.UI("написать") + " ↗", p.write);
+    if (safe(p.channel)) add("a", V.UI("канал") + " ↗", p.channel);
+    if (SECTION[box.dataset.links]) add("a", V.UI("раздел →"), SECTION[box.dataset.links]); else add("span", V.UI("раздел\u00a0— скоро"));
   });
+  /* переключатель языка вместо статичного RU */
+  document.querySelectorAll("[data-lang-slot]").forEach(function (el) { el.innerHTML = V.langSwitch(); });
 })();
 </script>
 
 <section id="intro" class="grain-surface" aria-label="viaspinosa.art">
   <canvas id="c" aria-hidden="true"></canvas>
   <div class="corner tl"><b>viaspinosa.art</b></div>
-  <div class="corner tr" id="hint">нажмите куда угодно</div>
-  <div class="corner bl">Сергей Потапов</div>
-  <div class="corner br">Лиза Конышева</div>
+  <div class="corner tr" id="hint" data-en="click anywhere">нажмите куда угодно</div>
+  <div class="corner bl" data-en="Sergey Potapov">Сергей Потапов</div>
+  <div class="corner br" data-en="Liza Konysheva">Лиза Конышева</div>
   <button type="button" class="sr" id="enter">Перейти к портфолио</button>
 </section>
 
@@ -225,7 +237,8 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
 /* ---------- первый экран → развилка: любое действие ---------- */
 (function () {
   var intro = document.getElementById("intro"), body = document.body, meta = document.querySelector('meta[name="theme-color"]');
-  if (matchMedia("(hover: none)").matches) document.getElementById("hint").textContent = "коснитесь экрана";
+  if (V.lang === "en") document.querySelectorAll("[data-en]").forEach(function (el) { el.textContent = el.getAttribute("data-en"); });
+  if (matchMedia("(hover: none)").matches) document.getElementById("hint").textContent = V.lang === "en" ? "tap the screen" : "коснитесь экрана";
   function leave() {
     if (intro.classList.contains("out")) return;
     intro.classList.add("out"); body.classList.remove("intro-on");
@@ -244,6 +257,8 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   addEventListener("keydown", function (e) { if (!intro.classList.contains("out") && !e.metaKey && !e.ctrlKey && !e.altKey) leave(); });
   document.getElementById("enter").addEventListener("click", leave);
   document.querySelectorAll(".back").forEach(function (b) { b.addEventListener("click", back); });
+  /* после смены языка сразу показываем развилку, без первого экрана */
+  try { if (sessionStorage.getItem("skipIntro")) { sessionStorage.removeItem("skipIntro"); intro.style.transition = "none"; leave(); } } catch (e) {}
 })();
 
 /* ---------- аватары: однобитное зерно в цветах своей половины ----------

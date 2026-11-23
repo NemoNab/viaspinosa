@@ -125,3 +125,6 @@ button.pill:hover { border-color: var(--f); color: var(--f); }
   .ph { border: 0; }
   a { text-decoration: none; }
 }
+
+.lang a { color: var(--m); } .lang a:hover { color: var(--f); } .lang b { font-weight: 400; color: var(--f); }
+@media print { .lang { display: none; } }

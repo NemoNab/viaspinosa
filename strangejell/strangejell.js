@@ -1,7 +1,7 @@
 /* Раздел Лизы: главная, страница работы и CV. Данные — window.LIZA (data.js) и window.SITE (config.js). */
 (function () {
   var L = window.LIZA || {}, S = window.SITE || {}, V = window.V;
-  var me = (S.people && S.people.l) || {};
+  var me = window.V.person(S, "l");
   var tx = V.tx, esc = V.esc, UI = V.UI, safe = V.safe;
   var page = document.body.getAttribute("data-page"), root = document.getElementById("app");
   var BASE = "/strangejell/";
@@ -20,12 +20,12 @@
 
   function ph(r, label) { return '<div class="ph" style="aspect-ratio:' + String(r || "4:3").replace(":", "/") + '">' + esc(label || r) + '</div>'; }
   function wurl(w) { return BASE + w.id + "/"; }
-  var status = (S.status && S.status.l) || {};
+  var stText = V.status(S, "l");
   var draft = L.draft ? '<div class="draft">' + esc(UI("черновик раздела · тексты и картинки в работе")) + '</div>' : "";
 
   function head(active) {
     var nav = [["#works", "работы"], ["#reel", "шоурил"], ["#about", "обо мне"], [BASE + "cv/", "cv"]];
-    return '<div class="wrap"><header class="head"><a href="' + BASE + '">лиза конышева</a><nav>' +
+    return '<div class="wrap"><header class="head"><a href="' + BASE + '">' + esc(String(me.name || "Лиза Конышева").toLowerCase()) + '</a><nav>' +
       nav.map(function (n) { var h = n[0].charAt(0) === "#" ? BASE + n[0] : n[0]; return '<a href="' + h + '"' + (active === n[1] ? ' class="on"' : '') + '>' + esc(UI(n[1])) + '</a>'; }).join("") +
       '</nav>' + V.langSwitch() + '</header></div>';
   }
@@ -48,7 +48,7 @@
   if (page === "home") {
     var h = [draft, head("")];
     h.push('<div class="wrap"><div class="hero"><h1>' + tx(me.name || "Лиза Конышева") + '</h1><div class="side">' +
-      (status.on && status.text ? '<div class="status">' + tx(status.text) + '</div>' : '') +
+      (stText ? '<div class="status">' + tx(stText) + '</div>' : '') +
       '<p>' + tx(me.desc) + '</p><div class="mono">' + tx(me.city) + '</div>' + contacts() + '</div></div>');
 
     /* шоурил */

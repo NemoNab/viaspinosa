@@ -83,3 +83,5 @@ a.entry:hover h3, a.entry:hover .meta i { color: var(--f); text-decoration: unde
   .theses, .pgal { grid-column: 1 / -1; }
   .pgal { grid-template-columns: 1fr; } .pgal figure { grid-column: auto !important; margin-top: 0 !important; }
 }
+
+.lang a { color: var(--m); } .lang a:hover { color: var(--f); } .lang b { font-weight: 400; color: var(--i); }

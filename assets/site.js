@@ -35,7 +35,7 @@
   }
   function safe(u) { return typeof u === "string" && /^(https?:|mailto:|tg:)/i.test(u); }
   function setLang(l) {
-    try { localStorage.setItem("lang", l); } catch (e) {}
+    try { localStorage.setItem("lang", l); sessionStorage.setItem("skipIntro", "1"); } catch (e) {}
     var u = location.pathname + location.search.replace(/([?&])lang=(ru|en)&?/, "$1").replace(/[?&]$/, "") + location.hash;
     location.href = u;
   }
@@ -63,7 +63,21 @@
     "Дизайн": "Design", "PR и проекты": "PR and projects", "Штуки": "Tools", "операционка и автоматизация": "operations and automation",
     "пиар и проекты": "PR and projects", "раздел →": "section →", "раздел — скоро": "section — soon", "назад": "back"
   };
+  /* имена и город по-английски, пока нет своих текстов */
+  var EN_PEOPLE = { n: { name: "Sergey Potapov", city: "Yekaterinburg → Almaty" }, l: { name: "Liza Konysheva", city: "Yekaterinburg → Almaty" } };
+  function person(S, k) {
+    var p = (S && S.people && S.people[k]) || {}, o = {};
+    for (var f in p) o[f] = p[f];
+    if (lang === "en") { var e = p.en || {}, d = EN_PEOPLE[k] || {}; ["name", "city", "desc", "tags"].forEach(function (f) { if (e[f]) o[f] = e[f]; else if (d[f]) o[f] = d[f]; }); }
+    return o;
+  }
+  function status(S, k) {
+    var st = (S && S.status) || {}; if ("on" in st) st = { n: st };
+    st = st[k] || {};
+    var t = lang === "en" && st.en ? st.en : st.text;
+    return st.on && t ? t : "";
+  }
   function UI(s) { return lang === "en" && D[s] ? D[s] : s; }
 
-  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI };
+  window.V = { lang: lang, pick: pick, nb: nb, esc: esc, tx: tx, safe: safe, setLang: setLang, langSwitch: langSwitch, UI: UI, person: person, status: status };
 })();
