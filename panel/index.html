@@ -55,7 +55,25 @@
   #msg { font: 400 12px/1.4 var(--mono); }
   #msg.ok { color: var(--ok); } #msg.err { color: var(--err); }
   a { color: var(--ink); }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; padding: 18px 0 4px; }
+  .tabs button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .tabs button i { font-style: normal; color: var(--err); }
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+  .fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .fld.wide, .fld:has(textarea), .grp { grid-column: 1 / -1; }
+  .fld input.en, .fld textarea.en { border-style: dashed; }
+  .fld.check { flex-direction: row; align-items: center; }
+  .grp { border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .grp legend { padding: 0 6px; font: 400 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+  details.item { border: 1px solid var(--line); border-radius: 8px; padding: 0 14px; }
+  details.item[open] { padding-bottom: 14px; }
+  details.item summary { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px 0; list-style: none; }
+  details.item summary::-webkit-details-marker { display: none; }
+  details.item .ttl { font: 500 15px/1.3 var(--sans); }
+  .items { display: flex; flex-direction: column; gap: 8px; }
+  small.hint { font-size: 11px; }
   @media (max-width: 760px) {
+    .form { grid-template-columns: 1fr; }
     .grid2 { grid-template-columns: 1fr; }
     table, tbody, tr, td { display: block; width: 100%; } thead { display: none; }
     tr { border-top: 1px solid var(--line); padding: 10px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -69,6 +87,14 @@
     <h1>пульт</h1>
     <span class="hint">viaspinosa.art · изменения появляются на&nbsp;сайте примерно через минуту после сохранения · <a href="/" target="_blank">открыть сайт ↗</a></span>
   </header>
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="site" class="on">сайт и развилка</button>
+    <button type="button" data-tab="spotted">проекты Сергея</button>
+    <button type="button" data-tab="cv">CV Сергея</button>
+    <button type="button" data-tab="liza">раздел Лизы</button>
+  </nav>
+  <p class="hint">Пунктирное поле под русским — английская версия. Пустое — значит, на английском сайте будет русский текст. Текст в [квадратных скобках] показывается как заглушка.</p>
+  <div data-pane="site">
 
   <section>
     <h2>Статус</h2>
@@ -76,11 +102,13 @@
       <span class="mono" style="width:56px">Сергей</span>
       <label class="check"><input type="checkbox" id="st-n-on"><span>показывать</span></label>
       <label style="flex:1;min-width:220px"><span>текст</span><input type="text" id="st-n-text" placeholder="беру проекты" maxlength="60"></label>
+      <label style="flex:1;min-width:220px"><span>по-английски</span><input type="text" id="st-n-en" placeholder="open for projects" maxlength="60"></label>
     </div>
     <div class="row" style="margin-top:12px">
       <span class="mono" style="width:56px">Лиза</span>
       <label class="check"><input type="checkbox" id="st-l-on"><span>показывать</span></label>
       <label style="flex:1;min-width:220px"><span>текст</span><input type="text" id="st-l-text" placeholder="беру проекты" maxlength="60"></label>
+      <label style="flex:1;min-width:220px"><span>по-английски</span><input type="text" id="st-l-en" placeholder="open for projects" maxlength="60"></label>
     </div>
   </section>
 
@@ -107,6 +135,10 @@
     <label><span>адрес Apps Script (web app)</span><input type="url" id="endpoint" placeholder="https://script.google.com/macros/s/…/exec"></label>
     <p class="hint">Задаётся один раз. Адрес сохраняется вместе с настройками.</p>
   </section>
+  </div>
+  <div data-pane="spotted" hidden><section><h2>Проекты Сергея</h2><p class="hint">Порядок здесь — порядок в колонках раздела. Новый проект появляется на сайте сразу; короткий адрес для него закрепится при следующей сборке.</p><div class="box"></div></section></div>
+  <div data-pane="cv" hidden><section><h2>CV Сергея</h2><div class="box"></div></section></div>
+  <div data-pane="liza" hidden><section><h2>Раздел Лизы</h2><div class="box"></div></section></div>
 </div>
 
 <div class="save"><div class="wrap">
@@ -116,10 +148,12 @@
   <span id="msg"></span>
 </div></div>
 
+<script src="/panel/editor.js"></script>
+<script src="/panel/schemas.js"></script>
 <script>
 (function () {
   var FIELDS = [["name","имя","text"],["city","город","text"],["desc","описание","area"],["tags","направления","text"],["write","ссылка «написать»","url"],["channel","ссылка «канал»","url"]];
-  var cfg;
+  var cfg, dirty = { site: false, projects: false, cv: false, liza: false }, DATA = {};
   var $ = function (id) { return document.getElementById(id); };
   function msg(t, cls) { $("msg").textContent = t; $("msg").className = cls || ""; }
 
@@ -130,6 +164,7 @@
       cfg = JSON.parse(JSON.stringify(window.SITE));
       var st = cfg.status || {}; if ("on" in st) st = { n: st };
       cfg.status = { n: st.n || { on: false, text: "" }, l: st.l || { on: false, text: "" } };
+      ["n","l"].forEach(function (k) { cfg.people[k].en = cfg.people[k].en || {}; });
       render();
     };
     s.onerror = function () { msg("не удалось загрузить config.js", "err"); };
@@ -139,7 +174,7 @@
   function swatch(p) { return '<span class="sw" style="background:' + p.bg + '"><i style="background:' + p.fg + '"></i><b style="opacity:' + p.grain + '"></b></span>'; }
 
   function render() {
-    ["n","l"].forEach(function (k) { $("st-" + k + "-on").checked = !!cfg.status[k].on; $("st-" + k + "-text").value = cfg.status[k].text || ""; });
+    ["n","l"].forEach(function (k) { $("st-" + k + "-on").checked = !!cfg.status[k].on; $("st-" + k + "-text").value = cfg.status[k].text || ""; $("st-" + k + "-en").value = cfg.status[k].en || ""; });
     $("endpoint").value = (cfg.panel && cfg.panel.endpoint) || "";
     var tb = $("pal"); tb.textContent = "";
     cfg.palettes.forEach(function (p, i) {
@@ -170,7 +205,7 @@
         tr.querySelector(".gv").textContent = p.grain.toFixed(2);
       }
       tr.addEventListener("input", upd); upd();
-      tr.querySelector(".del").onclick = function () { if (cfg.palettes.length > 1 && confirm("Удалить палитру «" + p.name + "»?")) { cfg.palettes.splice(i, 1); render(); } };
+      tr.querySelector(".del").onclick = function () { if (cfg.palettes.length > 1 && confirm("Удалить палитру «" + p.name + "»?")) { cfg.palettes.splice(i, 1); dirty.site = true; mark(); render(); } };
       tb.appendChild(tr);
     });
     ["n","l"].forEach(function (k) {
@@ -183,16 +218,30 @@
         inp.addEventListener("input", function () { cfg.people[k][f[0]] = inp.value; });
         l.appendChild(span); l.appendChild(inp); box.appendChild(l);
       });
+      FIELDS.slice(0, 4).forEach(function (f) {
+        var l = document.createElement("label"), span = document.createElement("span"), inp = document.createElement(f[2] === "area" ? "textarea" : "input");
+        span.textContent = f[1] + " · по-английски"; if (f[2] !== "area") inp.type = "text"; inp.className = "en";
+        inp.value = cfg.people[k].en[f[0]] || "";
+        inp.addEventListener("input", function () { cfg.people[k].en[f[0]] = inp.value; dirty.site = true; });
+        l.appendChild(span); l.appendChild(inp); box.appendChild(l);
+      });
     });
   }
 
   ["n","l"].forEach(function (k) {
     $("st-" + k + "-on").onchange = function () { cfg.status[k].on = this.checked; };
     $("st-" + k + "-text").oninput = function () { cfg.status[k].text = this.value; };
+    $("st-" + k + "-en").oninput = function () { cfg.status[k].en = this.value; };
   });
   $("endpoint").oninput = function () { cfg.panel = cfg.panel || {}; cfg.panel.endpoint = this.value.trim(); };
-  $("add-pal").onclick = function () { cfg.palettes.push({ name: "новая", by: "n", bg: "#00030a", fg: "#f2f0ea", grain: 0.2, on: false }); render(); };
-  $("reset").onclick = function () { cfg = JSON.parse(JSON.stringify(window.SITE)); render(); msg("правки отменены"); };
+  $("add-pal").onclick = function () { cfg.palettes.push({ name: "новая", by: "n", bg: "#00030a", fg: "#f2f0ea", grain: 0.2, on: false }); dirty.site = true; mark(); render(); };
+  $("reset").onclick = function () {
+    if (!confirm("Отменить все несохранённые правки на всех вкладках?")) return;
+    cfg = JSON.parse(JSON.stringify(window.SITE)); ["n","l"].forEach(function (k) { cfg.people[k].en = cfg.people[k].en || {}; });
+    DATA = {}; Object.keys(dirty).forEach(function (k) { dirty[k] = false; }); mark(); render();
+    var t = document.querySelector("#tabs button.on").dataset.tab; openPane("site"); if (t !== "site") openPane(t);
+    msg("правки отменены");
+  };
 
   function check() {
     var bad = [];
@@ -202,21 +251,69 @@
     return bad;
   }
 
+  /* ---------- вкладки с данными разделов ---------- */
+  var PANES = {
+    spotted: { key: "projects", url: "/spotted/projects.js", name: "PROJECTS", wrap: function (d) { return { list: d }; }, unwrap: function (o) { return o.list; }, schema: function () { return [SCHEMAS.projects]; } },
+    cv: { key: "cv", url: "/spotted/cv/data.js", name: "CV", wrap: function (d) { return d; }, unwrap: function (o) { return o; }, schema: function () { return SCHEMAS.cv; } },
+    liza: { key: "liza", url: "/strangejell/data.js", name: "LIZA", wrap: function (d) { return d; }, unwrap: function (o) { return o; }, schema: function () { return SCHEMAS.liza; } }
+  };
+  function mark() {
+    document.querySelectorAll("#tabs button").forEach(function (b) {
+      var t = b.dataset.tab, k = t === "site" ? "site" : PANES[t].key;
+      b.innerHTML = b.textContent.replace(/ ●$/, "") + (dirty[k] ? " <i>●</i>" : "");
+    });
+  }
+  function openPane(t) {
+    document.querySelectorAll("#tabs button").forEach(function (b) { b.classList.toggle("on", b.dataset.tab === t); });
+    document.querySelectorAll("[data-pane]").forEach(function (p) { p.hidden = p.dataset.pane !== t; });
+    var P = PANES[t]; if (!P || DATA[P.key]) return;
+    var box = document.querySelector('[data-pane="' + t + '"] .box'); box.textContent = "загружаю…";
+    ED.loadData(P.url, P.name).then(function (d) {
+      DATA[P.key] = P.wrap(d); box.textContent = "";
+      ED.form(box, DATA[P.key], P.schema(), function () { dirty[P.key] = true; mark(); });
+    }).catch(function (e) { box.textContent = e.message; });
+  }
+  document.querySelectorAll("#tabs button").forEach(function (b) { b.onclick = function () { openPane(b.dataset.tab); }; });
+  document.querySelector('[data-pane="site"]').addEventListener("input", function () { dirty.site = true; mark(); });
+  document.querySelector('[data-pane="site"]').addEventListener("change", function () { dirty.site = true; mark(); });
+
+  function checkIds(list, where) {
+    var seen = {}, bad = [];
+    (list || []).forEach(function (x) {
+      var id = x.id || "";
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) bad.push(where + ": адрес «" + id + "» — только латиница, цифры и дефис");
+      else if (["cv", "p", "w", "demo", "assets"].indexOf(id) >= 0) bad.push(where + ": адрес «" + id + "» занят");
+      else if (seen[id]) bad.push(where + ": адрес «" + id + "» повторяется");
+      seen[id] = 1;
+    });
+    return bad;
+  }
+
   $("save").onclick = function () {
-    var bad = check(); if (bad.length) { msg(bad[0], "err"); return; }
-    var url = cfg.panel && cfg.panel.endpoint; if (!url) { msg("укажите адрес Apps Script внизу страницы", "err"); return; }
+    var bad = check();
+    if (dirty.projects) bad = bad.concat(checkIds(DATA.projects.list, "проекты"));
+    if (dirty.liza) bad = bad.concat(checkIds(DATA.liza.works, "работы Лизы"));
+    if (bad.length) { msg(bad[0], "err"); return; }
+    if (!dirty.site && !dirty.projects && !dirty.cv && !dirty.liza) { msg("нечего сохранять"); return; }
+    var url = cfg.panel && cfg.panel.endpoint; if (!url) { msg("укажите адрес Apps Script на вкладке «сайт и развилка»", "err"); return; }
     if (!$("pw").value) { msg("введите пароль", "err"); return; }
-    cfg.updated = new Date().toISOString();
+    var body = { password: $("pw").value, data: {} };
+    if (dirty.site) { cfg.updated = new Date().toISOString(); body.config = cfg; }
+    Object.keys(PANES).forEach(function (t) { var P = PANES[t]; if (dirty[P.key]) body.data[P.key] = P.unwrap(DATA[P.key]); });
     $("save").disabled = true; msg("сохраняю…");
-    fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ password: $("pw").value, config: cfg }) })
+    fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) })
       .then(function (r) { return r.json(); })
       .then(function (r) {
-        if (r.ok) { window.SITE = JSON.parse(JSON.stringify(cfg)); msg("сохранено, сайт обновится примерно через минуту", "ok"); }
-        else msg(r.error || "не получилось сохранить", "err");
+        if (r.ok) {
+          if (body.config) window.SITE = JSON.parse(JSON.stringify(cfg));
+          Object.keys(dirty).forEach(function (k) { dirty[k] = false; }); mark();
+          msg("сохранено (" + (r.files || []).join(", ") + "), сайт обновится примерно через минуту", "ok");
+        } else msg(r.error || "не получилось сохранить", "err");
       })
       .catch(function (e) { msg("нет связи с Apps Script: " + e.message, "err"); })
       .finally(function () { $("save").disabled = false; });
   };
+  window.addEventListener("beforeunload", function (e) { if (dirty.site || dirty.projects || dirty.cv || dirty.liza) { e.preventDefault(); e.returnValue = ""; } });
 
   load();
 })();
