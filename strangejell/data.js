@@ -17,14 +17,20 @@ window.LIZA = {
 
   /* 8–15 лучших работ. kind: анимация, иллюстрация, объекты (скульптура, текстиль, гравюра) */
   works: [
-    { id: "work-1", kind: "анимация", title: "[работа 1]", year: "", role: "[роль]", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]" },
-    { id: "work-2", kind: "иллюстрация", title: "[работа 2]", year: "", role: "[роль]", client: "[для кого]", ph: "4:5", line: "[одна строка о сути]" },
-    { id: "work-3", kind: "анимация", title: "[работа 3]", year: "", role: "[роль]", client: "[для кого]", ph: "1:1", line: "[одна строка о сути]" },
-    { id: "work-4", kind: "иллюстрация", title: "[работа 4]", year: "", role: "[роль]", client: "[для кого]", ph: "3:4", line: "[одна строка о сути]" },
-    { id: "work-5", kind: "анимация", title: "[работа 5]", year: "", role: "[роль]", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]" },
-    { id: "work-6", kind: "иллюстрация", title: "[работа 6]", year: "", role: "[роль]", client: "[для кого]", ph: "4:5", line: "[одна строка о сути]" },
-    { id: "work-7", kind: "анимация", title: "[работа 7]", year: "", role: "[роль]", client: "[для кого]", ph: "1:1", line: "[одна строка о сути]" },
-    { id: "work-8", kind: "иллюстрация", title: "[работа 8]", year: "", role: "[роль]", client: "[для кого]", ph: "3:2", line: "[одна строка о сути]" }
+    { id: "poka-tikayut", kind: "анимация", title: "«Пока ещё тикают»", year: "2026", role: "анимационные вставки", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]" },
+    { id: "galilei", kind: "анимация", title: "«Галилей»", year: "2026", role: "две анимации в технике перекладки", client: "Московский планетарий", ph: "16:9", line: "[одна строка о сути]", url: "https://planetarium-moscow.ru/afisha/galilei-i-tayny-nebesnykh-sfer-205" },
+    { id: "lunnyi-sad", kind: "анимация", title: "«Лунный сад»", year: "2026", role: "анимация", client: "фильм Евгении Хазихановой", ph: "16:9", line: "[одна строка о сути]" },
+    { id: "yeltsin-masterclass", kind: "анимация", title: "Мастер-класс в арт-галерее", year: "2026", role: "анимация", client: "Ельцин Центр", ph: "16:9", line: "[одна строка о сути]", url: "https://www.instagram.com/reel/Ddoeu2wIUgX/" },
+    { id: "piotrovsky-10", kind: "анимация", title: "10 лет «Пиотровскому»", year: "2025", role: "анимационный ролик", client: "книжный «Пиотровский»", ph: "16:9", line: "[одна строка о сути]", url: "https://www.instagram.com/reel/DReJx1_jGmx/" },
+    { id: "mify-o-gefeste", kind: "анимация", title: "«Мифы о Гефесте, боге и стройотряде»", year: "2025", role: "анимационные вставки", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]", url: "https://endofsummer.fun/?project=myths-about-god" },
+    { id: "ket", kind: "анимация", title: "ketfromwyoming", year: "2025", role: "анимация", client: "криптовалюта $KET", ph: "16:9", line: "[одна строка о сути]", url: "https://youtube.com/@ketfromwyoming" },
+    { id: "emmi-wuffi", kind: "анимация", title: "Маскоты Emmi и Wuffi", year: "2024", role: "короткие анимации", client: "Magic Eden и Wuffi", ph: "16:9", line: "[одна строка о сути]" },
+    { id: "planeta-yandeksoidov", kind: "анимация", title: "«Планета Яндексоидов»", year: "2023", role: "анимация ролика", client: "фестиваль Бадди", ph: "16:9", line: "[одна строка о сути]", url: "https://silvermercury.ru/winners/yandeks-kinobaddifest-2024-5052" },
+    { id: "take-my-muffin", kind: "анимация", title: "Take my muffin", year: "2023", role: "анимация для одной серии", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]" },
+    { id: "bum-zemli", kind: "анимация", title: "«Бум земли! Краб и Кальмар спасают океан»", year: "2022–2024", role: "ведущий аниматор, заставка", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]", url: "https://www.animator.ru/db/?p=show_film&fid=9542" },
+    { id: "moya-malenkaya-zhizn", kind: "анимация", title: "«Моя маленькая жизнь на острове»", year: "2022", role: "анимация", client: "фильм Нины Бисяриной", ph: "16:9", line: "[одна строка о сути]" },
+    { id: "vyhod-borodacha", kind: "анимация", title: "«Выход Бородача»", year: "2022", role: "аниматор", client: "[для кого]", ph: "16:9", line: "[одна строка о сути]", url: "https://rutube.ru/channel/76895556/videos/" },
+    { id: "supermario", kind: "анимация", title: "«Супермарио»", year: "2021", role: "[роль]", client: "клип", ph: "16:9", line: "[одна строка о сути]", url: "https://youtu.be/bVSJLMkDxbE" }
   ],
 
 

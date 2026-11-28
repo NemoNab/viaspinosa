@@ -56,7 +56,7 @@
     "Результат": "Result", "Год": "Year", "Где": "Where", "Роль": "Role", "Направление": "Field", "Профиль": "Profile",
     "Канал и контакты": "Channel and contacts", "Контакты": "Contacts", "проектов": "projects", "концепт, не внедрён": "concept, not implemented",
     "черновик раздела · тексты и картинки в работе": "draft · texts and images in progress", "черновик · тексты в работе": "draft · texts in progress",
-    "работы": "works", "работ": "works", "хочу работать с": "want to work with", "образование, опыт, выставки": "education, experience, exhibitions", "о работе": "about the work", "следующая работа": "next work", "Для кого": "Client", "Имя": "Name", "Город": "City", "все": "all", "шоурил": "showreel", "обо мне": "about", "личные серии": "personal series", "купить работу": "buy a work",
+    "работы": "works", "работ": "works", "смотреть": "watch", "хочу работать с": "want to work with", "образование, опыт, выставки": "education, experience, exhibitions", "о работе": "about the work", "следующая работа": "next work", "Для кого": "Client", "Имя": "Name", "Город": "City", "все": "all", "шоурил": "showreel", "обо мне": "about", "личные серии": "personal series", "купить работу": "buy a work",
     "образование": "education", "опыт": "experience", "выставки и фестивали": "exhibitions and festivals", "программы и техники": "software and techniques",
     "кейсы": "cases", "навыки": "skills", "задача": "task", "что сделал": "what I did", "результат": "result", "моё": "mine", "не моё": "not mine",
     "обновлено": "updated", "скачать pdf ↓": "download pdf ↓", "такого проекта нет": "no such project", "демо": "demo",

@@ -114,7 +114,8 @@
     g.push('<div class="ptitle"><a class="back" href="' + BASE + (kn ? '#k' + kn : '') + '">← ' + esc(UI("все работы")) + '</a><h1>' + tx(w.title) + '</h1></div>');
     g.push('<div class="pmeta"><div>' + esc(UI("Год")) + '<b>' + tx(w.year || "[год]") + '</b></div><div>' + esc(UI("Роль")) + '<b>' + tx(w.role || "[роль]") + '</b></div>' +
       '<div>' + esc(UI("Для кого")) + '<b>' + tx(w.client || "[для кого]") + '</b></div><div>' + esc(UI("Направление")) + '<b>' + esc(kl(w.kind)) + '</b></div></div>');
-    g.push('<div class="pbody"><div class="theses"><div><div class="n">01</div><h3>' + esc(UI("о работе")) + '</h3><p>' + tx(w.text || w.line || "[текст]") + '</p></div>');
+    g.push('<div class="pbody"><div class="theses"><div><div class="n">01</div><h3>' + esc(UI("о работе")) + '</h3><p>' + tx(w.text || w.line || "[текст]") + '</p>' +
+      (w.url && safe(w.url) ? '<p><a href="' + esc(w.url) + '">' + esc(UI("смотреть")) + ' ↗</a></p>' : '') + '</div>');
     g.push('<div class="next">' + esc(UI("следующая работа")) + ': <a href="' + wurl(nx) + '">' + tx(nx.title) + ' →</a></div></div>');
     var imgs = w.images && w.images.length ? w.images : [{ ratio: w.ph || "3:2", label: "главный кадр " + (w.ph || "") }, { ratio: "3:4", label: "раскадровка или скетч" }, { ratio: "1:1", label: "деталь" }];
     var place = ["grid-column:1/7", "grid-column:1/4;margin-top:80px", "grid-column:4/7"];
