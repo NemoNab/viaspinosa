@@ -48,7 +48,7 @@ ${noindex ? '<meta name="robots" content="noindex">\n' : ""}<link rel="canonical
 <style>
 ${fonts}
 </style>
-<link rel="stylesheet" href="${css}">
+${[].concat(css).map((c) => `<link rel="stylesheet" href="${c}">`).join("\n")}
 </head>
 <body ${body}>
 <div class="gfix grain-surface" aria-hidden="true"></div>
@@ -109,17 +109,19 @@ const LZ = load("strangejell/data.js").LIZA || {};
 const works = LZ.works || [];
 checkIds(works, "strangejell/data.js");
 const lzScripts = ["/strangejell/data.js", "/strangejell/strangejell.js"];
+/* раздел Лизы в той же сетке, что раздел Сергея: общие стили + её поверх */
+const LZCSS = ["/spotted/spotted.css", "/strangejell/strangejell.css"];
 write("strangejell/index.html", page({
   title: "Лиза Конышева · viaspinosa.art", desc: "Лиза Конышева: 2D-анимация, иллюстрация, арт-дирекшн.",
-  url: "/strangejell/", css: "/strangejell/strangejell.css", scripts: lzScripts, body: 'data-page="home"' }));
+  url: "/strangejell/", css: LZCSS, scripts: lzScripts, body: 'data-page="home"' }));
 for (const w of works) {
   write(`strangejell/${w.id}/index.html`, page({
     title: `${plain(w.title)} · Лиза Конышева · viaspinosa.art`, desc: plain(w.line) || `Работа Лизы Конышевой.`,
-    url: `/strangejell/${w.id}/`, css: "/strangejell/strangejell.css", scripts: lzScripts, body: `data-page="work" data-id="${w.id}"` }));
+    url: `/strangejell/${w.id}/`, css: LZCSS, scripts: lzScripts, body: `data-page="work" data-id="${w.id}"` }));
 }
 write("strangejell/cv/index.html", page({
   title: "Лиза Конышева — CV · viaspinosa.art", desc: "CV Лизы Конышевой: образование, опыт, выставки, программы.",
-  url: "/strangejell/cv/", css: "/strangejell/strangejell.css", scripts: lzScripts, body: 'data-page="cv"' }));
+  url: "/strangejell/cv/", css: LZCSS, scripts: lzScripts, body: 'data-page="cv"' }));
 
 /* ---------- лишние страницы от удалённых проектов ---------- */
 for (const [dir, ids] of [["spotted", SP.map((p) => p.id)], ["strangejell", works.map((w) => w.id)]]) {

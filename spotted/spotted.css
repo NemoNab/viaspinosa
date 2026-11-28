@@ -77,6 +77,7 @@ a.entry:hover h3, a.entry:hover .meta i { color: var(--f); text-decoration: unde
   .col:first-child { border-top: 0; }
   .chead { display: block; }
   .bottom { padding: 0 16px; }
+  .bottom > span:nth-child(2) { display: none; }
   .ptitle { padding: 28px 16px 0; }
   .pmeta { grid-template-columns: 1fr 1fr; padding: 20px 16px; }
   .pbody { grid-template-columns: 1fr; padding: 32px 16px 56px; }
