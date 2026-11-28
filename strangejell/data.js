@@ -9,7 +9,7 @@ window.LIZA = {
      url — ссылка на файл .mp4 в Cloudflare R2 (или YouTube/Vimeo), poster — картинка до запуска */
   showreels: [
     { years: "2025–2026", url: "", poster: "", caption: "[подпись: что в шоуриле]" },
-    { years: "2021–2024", url: "", poster: "", caption: "[подпись: что в шоуриле]" }
+    { years: "2021–2024", url: "https://media.viaspinosa.art/Liza%20Konysheva%20Showreel%202021-2024.mp4", poster: "", caption: "[подпись: что в шоуриле]" }
   ],
 
   /* направления: порядок фильтров и метки на карточках. kind у работы — одно из k */

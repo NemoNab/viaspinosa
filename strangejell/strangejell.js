@@ -59,6 +59,8 @@
     var RE = (L.showreels || []).slice();
     function ly(x) { var m = String(x.years || "").match(/\d{4}/g); return m ? +m[m.length - 1] : 0; }
     RE.sort(function (a, b) { return ly(b) - ly(a); });
+    /* пока ролика нет — его год не показываем; заглушка остаётся, только если роликов нет вовсе */
+    var withVideo = RE.filter(function (x) { return x.url && safe(x.url); }); if (withVideo.length) RE = withVideo;
     h.push('<div class="reelrow" id="reel"><div class="rhead"><div class="meta">' + esc(UI("шоурил")) + '</div>' +
       (RE.length > 1 ? '<div class="years">' + RE.map(function (x, n) { return '<button type="button" data-r="' + n + '"' + (n ? '' : ' class="on"') + '>' + esc(x.years || "—") + '</button>'; }).join("") + '</div>' : '') +
       '</div><div class="reelbox"></div></div>');
