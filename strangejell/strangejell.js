@@ -58,11 +58,13 @@
       '<p>' + tx(me.desc) + '</p><div class="mono">' + tx(me.city) + '</div>' + contacts() + '</div></div>');
 
     /* шоурил */
-    var R = L.showreel || {};
-    var vid = R.url && safe(R.url)
-      ? (/youtube|youtu\.be|vimeo/.test(R.url) ? '<iframe src="' + esc(R.url) + '" allowfullscreen loading="lazy" title="showreel"></iframe>' : '<video src="' + esc(R.url) + '" controls preload="metadata"></video>')
-      : ph("16:9", "шоурил " + (R.years || ""));
-    h.push('<section id="reel"><span class="k">' + esc(UI("шоурил")) + '</span><div class="reel">' + vid + '<p>' + tx(R.caption) + '</p></div></section>');
+    var REELS = (L.showreels || (L.showreel ? [L.showreel] : [])).slice();
+    /* самый свежий — по последнему году в «годах» */
+    function lastYear(r) { var m = String(r.years || "").match(/\d{4}/g); return m ? +m[m.length - 1] : 0; }
+    REELS.sort(function (a, b) { return lastYear(b) - lastYear(a); });
+    h.push('<section id="reel"><span class="k">' + esc(UI("шоурил")) + '</span>' +
+      (REELS.length > 1 ? '<div class="filters reel-years">' + REELS.map(function (r, n) { return '<button data-reel="' + n + '"' + (n ? '' : ' class="on"') + '>' + esc(r.years || "—") + '</button>'; }).join("") + '</div>' : '') +
+      '<div class="reel" id="reel-box"></div></section>');
 
     /* работы */
     var K = L.kinds || [], kinds = K.map(function (x) { return x.k; });
@@ -72,7 +74,7 @@
     h.push('<div class="grid">');
     (L.works || []).forEach(function (w) {
       h.push('<a class="work" data-kind="' + esc(w.kind) + '" href="' + wurl(w) + '">' + V.img(w.cover, w.ph, w.title, w.kind) +
-        '<div class="mono">' + esc(kl(w.kind)) + (w.year ? ' · ' + esc(w.year) : '') + '</div><h3>' + tx(w.title) + '</h3><p>' + tx(w.line) + '</p></a>');
+        '<div class="mono">' + esc(kl(w.kind)) + (w.year ? ' · ' + esc(w.year) : '') + (V.pick(w.role) && !/^\[/.test(V.pick(w.role)) ? ' · ' + tx(w.role) : '') + '</div><h3>' + tx(w.title) + '</h3><p>' + tx(w.line) + '</p></a>');
     });
     h.push('</div></section>');
 
@@ -89,7 +91,24 @@
     h.push(foot());
     root.innerHTML = h.join("");
 
-    var fb = root.querySelectorAll(".filters button");
+    /* шоурил: показываем выбранный, видео грузится только по клику на год или play */
+    function reel(n) {
+      var R = REELS[n] || {}, box = document.getElementById("reel-box"); if (!box) return;
+      var u = R.url && safe(R.url) ? R.url : "", vid;
+      if (!u) vid = ph("16:9", UI("шоурил") + " " + (R.years || ""));
+      else if (/youtube|youtu\.be|vimeo/.test(u)) vid = '<iframe src="' + esc(u) + '" allowfullscreen loading="lazy" title="showreel"></iframe>';
+      else vid = '<video src="' + esc(u) + '" controls playsinline preload="metadata"' + (R.poster && safe(R.poster) ? ' poster="' + esc(R.poster) + '"' : '') + '></video>';
+      box.innerHTML = vid + '<p>' + tx(R.caption) + '</p>';
+    }
+    reel(0);
+    Array.prototype.forEach.call(root.querySelectorAll(".reel-years button"), function (b, n, all) {
+      b.addEventListener("click", function () {
+        Array.prototype.forEach.call(all, function (x) { x.classList.toggle("on", x === b); });
+        reel(+b.getAttribute("data-reel"));
+      });
+    });
+
+    var fb = root.querySelectorAll("#works .filters button");
     Array.prototype.forEach.call(fb, function (b) {
       b.addEventListener("click", function () {
         Array.prototype.forEach.call(fb, function (x) { x.classList.toggle("on", x === b); });

@@ -109,7 +109,7 @@ function tree_(v, where) {
       var s = x.replace(/\r/g, '');
       if (s.length > 5000) throw new Error(where + ': слишком длинный текст: ' + s.slice(0, 30) + '…');
       if (/^\s*(javascript|data|vbscript):/i.test(s)) throw new Error(where + ': недопустимая ссылка');
-      if (/^(url|write|channel|telegram|instagram|behance|youtube|demo)$/.test(key || '') && s && !/^(https?:|mailto:|tg:|\/)/i.test(s)) throw new Error(where + ': ссылка должна начинаться с https://: ' + s);
+      if (/^(url|write|channel|telegram|instagram|behance|youtube|demo|poster|src|cover)$/.test(key || '') && s && !/^(https?:|mailto:|tg:|\/)/i.test(s)) throw new Error(where + ': ссылка должна начинаться с https://: ' + s);
       return s;
     }
     if (Array.isArray(x)) { if (x.length > 200) throw new Error(where + ': слишком длинный список'); return x.map(function (y) { return walk(y, depth + 1, key); }); }
