@@ -20,6 +20,12 @@
 
   function ph(r, label) { return '<div class="ph" style="aspect-ratio:' + String(r || "4:3").replace(":", "/") + '">' + esc(label || r) + '</div>'; }
   function wurl(w) { return BASE + w.id + "/"; }
+  /* метка направления: «[А] анимация», в английской версии «[А] animation» */
+  function kl(k) {
+    var x = (L.kinds || []).filter(function (y) { return y.k === V.pick(k); })[0];
+    var en = V.lang === "en";
+    return x ? (en && x.tagEn ? x.tagEn : x.tag) + " " + (en && x.en ? x.en : x.k) : V.pick(k) || "";
+  }
   var stText = V.status(S, "l");
   var draft = L.draft ? '<div class="draft">' + esc(UI("черновик раздела · тексты и картинки в работе")) + '</div>' : "";
 
@@ -59,13 +65,14 @@
     h.push('<section id="reel"><span class="k">' + esc(UI("шоурил")) + '</span><div class="reel">' + vid + '<p>' + tx(R.caption) + '</p></div></section>');
 
     /* работы */
-    var kinds = []; (L.works || []).forEach(function (w) { if (kinds.indexOf(w.kind) < 0) kinds.push(w.kind); });
+    var K = L.kinds || [], kinds = K.map(function (x) { return x.k; });
+    (L.works || []).forEach(function (w) { if (w.kind && kinds.indexOf(w.kind) < 0) kinds.push(w.kind); });
     h.push('<section id="works"><span class="k">' + esc(UI("работы")) + '</span>');
-    if (kinds.length > 1) h.push('<div class="filters"><button class="on" data-kind="">все</button>' + kinds.map(function (k) { return '<button data-kind="' + esc(k) + '">' + tx(k) + '</button>'; }).join("") + '</div>');
+    if (kinds.length > 1) h.push('<div class="filters"><button class="on" data-kind="">' + esc(UI("все")) + '</button>' + kinds.map(function (k) { return '<button data-kind="' + esc(k) + '">' + esc(kl(k)) + '</button>'; }).join("") + '</div>');
     h.push('<div class="grid">');
     (L.works || []).forEach(function (w) {
       h.push('<a class="work" data-kind="' + esc(w.kind) + '" href="' + wurl(w) + '">' + V.img(w.cover, w.ph, w.title, w.kind) +
-        '<div class="mono">' + tx(w.kind) + (w.year ? ' · ' + esc(w.year) : '') + '</div><h3>' + tx(w.title) + '</h3><p>' + tx(w.line) + '</p></a>');
+        '<div class="mono">' + esc(kl(w.kind)) + (w.year ? ' · ' + esc(w.year) : '') + '</div><h3>' + tx(w.title) + '</h3><p>' + tx(w.line) + '</p></a>');
     });
     h.push('</div></section>');
 
@@ -102,7 +109,7 @@
     document.title = V.pick(w.title).replace(/[\[\]]/g, "") + " · Лиза Конышева · viaspinosa.art";
     var g = [draft, head("работы"), '<div class="wrap">'];
     g.push('<div class="wtitle"><a class="mono" href="' + BASE + '#works">← ' + esc(UI("все работы")) + '</a><h1>' + tx(w.title) + '</h1></div>');
-    g.push('<div class="wmeta"><div>' + esc(UI("Год")) + '<b>' + tx(w.year || "[год]") + '</b></div><div>' + esc(UI("Роль")) + '<b>' + tx(w.role) + '</b></div><div>для кого<b>' + tx(w.client) + '</b></div><div>' + esc(UI("Направление")) + '<b>' + tx(w.kind) + '</b></div></div>');
+    g.push('<div class="wmeta"><div>' + esc(UI("Год")) + '<b>' + tx(w.year || "[год]") + '</b></div><div>' + esc(UI("Роль")) + '<b>' + tx(w.role) + '</b></div><div>для кого<b>' + tx(w.client) + '</b></div><div>' + esc(UI("Направление")) + '<b>' + esc(kl(w.kind)) + '</b></div></div>');
     g.push('<div class="wbody"><div><p>' + tx(w.text || w.line) + '</p><p class="mono" style="margin-top:32px">' + esc(UI("дальше")) + ': <a href="' + wurl(nx) + '">' + tx(nx.title) + ' →</a></p></div>' +
       '<div class="wgal">' + (w.images && w.images.length ? w.images : [{ ratio: w.ph, label: "главный кадр " + (w.ph || "") }, { ratio: "16:9", label: "раскадровка или скетч" }]).map(function (m) {
         return '<figure>' + V.img(m.src, m.ratio, m.cap, m.label) + '<figcaption>' + tx(m.cap || "[подпись]") + '</figcaption></figure>';

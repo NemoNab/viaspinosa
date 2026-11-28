@@ -105,6 +105,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   .bar { min-height: 16px; }
   .bar .status { color: var(--i); }
   .half.l .bar { justify-content: flex-end; }
+  .half.l .bar.top { justify-content: flex-start; }   /* статус Лизы — слева, у её колонки */
   .only-m { display: none; }
   .who { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 56px 0 48px; max-width: 560px; }
   .head { display: flex; flex-direction: column; gap: 20px; }
@@ -190,7 +191,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
       </div>
       <div class="real" data-k="l.city">Екатеринбург → Алматы</div>
       <p class="desc" data-k="l.desc">2D-аниматор, арт-директор и художница. Рисует, лепит, режет гравюры и оживляет это на экране.</p>
-      <div class="tags" data-k="l.tags">анимация · рисунок · живопись · скульптура · гравюра</div>
+      <div class="tags" data-k="l.tags">[А] анимация · [И] иллюстрация · [О] объекты</div>
       <div class="links" data-links="l"><a href="https://t.me/strangejell_stuff">канал ↗</a><span>раздел — скоро</span></div>
     </div>
     <div class="bar bottom"><button type="button" class="back only-m" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span data-lang-slot>RU</span></div>

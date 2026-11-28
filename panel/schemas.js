@@ -57,7 +57,7 @@ window.SCHEMAS = (function () {
       { key: "showreel", label: "шоурил", type: "obj", fields: [{ key: "url", label: "ссылка на видео (YouTube, Vimeo или файл)", type: "url" }, { key: "years", label: "годы", type: "text" }, { key: "caption", label: "подпись", type: "t2", wide: true }] },
       { key: "works", label: "работы", type: "list", addLabel: "работа", blank: { id: "", kind: "анимация", title: "", year: "", role: "", client: "", ph: "4:3", line: "" },
         title: function (w) { return (window.ED.plain(w.title) || "без названия") + "  ·  " + window.ED.plain(w.kind) + (w.id ? "  ·  /" + w.id : ""); },
-        fields: [{ key: "id", label: "адрес (латиница, цифры, дефис)", type: "text" }, { key: "kind", label: "вид", type: "t2", hint: "анимация, иллюстрация…" },
+        fields: [{ key: "id", label: "адрес (латиница, цифры, дефис)", type: "text" }, { key: "kind", label: "вид", type: "t2", hint: "анимация, иллюстрация или объекты" },
           { key: "title", label: "название", type: "t2" }, { key: "year", label: "год", type: "text" }, { key: "role", label: "роль", type: "t2" }, { key: "client", label: "для кого", type: "t2" },
           { key: "line", label: "одна строка о сути", type: "t2", wide: true }, { key: "text", label: "текст на странице работы", type: "t2a" },
           { key: "ph", label: "пропорция", type: "text", ph: "4:5" }, { key: "cover", label: "обложка", type: "text", ph: "/assets/img/strangejell/work-1/01" }, IMG] },
