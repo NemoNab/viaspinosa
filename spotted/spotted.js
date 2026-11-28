@@ -26,7 +26,7 @@
     h.push('<div class="col profile"><div><div class="meta">' + esc(UI("Профиль")) + '</div><h1>' + tx(me.name || "Сергей Потапов") + '</h1><p>' + tx(me.desc || "") + '</p></div>');
     if (stText) h.push('<div class="status">' + tx(stText) + '</div>');
     h.push('<div class="meta">' + tx(me.city || "") + '</div>');
-    h.push('<div class="legend"><b>[PR]</b> пиар и партнёрства<br><b>[Д]</b> дизайн и картинки<br><b>[Ш]</b> штуки: автоматизация и всё остальное</div>');
+    h.push('<div class="legend"><b>[PR]</b> пиар и партнёрства<br><b>[Д]</b> дизайн и картинки<br><b>[А]</b> автоматизация</div>');
     h.push('<div class="pills">' + (safe(me.write) ? '<a class="pill main" href="' + esc(me.write) + '">' + esc(UI("написать")) + ' ↗</a>' : '') +
       '<a class="pill" href="/spotted/cv/auto/">CV</a></div></div>');
     /* три колонки проектов */

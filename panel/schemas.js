@@ -23,10 +23,10 @@ window.SCHEMAS = (function () {
   ];
   return {
     projects: { key: "list", type: "list", label: "проекты", addLabel: "проект", blank: { id: "", cat: "pr", title: "", year: "", tags: "", line: "" },
-      title: function (p) { return (window.ED.plain(p.title) || "без названия") + "  ·  " + ({ d: "дизайн", pr: "PR", a: "штуки" }[p.cat] || "") + (p.id ? "  ·  /" + p.id : ""); },
+      title: function (p) { return (window.ED.plain(p.title) || "без названия") + "  ·  " + ({ d: "дизайн", pr: "PR", a: "автоматизация" }[p.cat] || "") + (p.id ? "  ·  /" + p.id : ""); },
       fields: [
         { key: "id", label: "адрес (латиница, цифры, дефис)", type: "text", ph: "veranda" },
-        { key: "cat", label: "колонка", type: "sel", opts: [["d", "Дизайн"], ["pr", "PR и проекты"], ["a", "Штуки"]] },
+        { key: "cat", label: "колонка", type: "sel", opts: [["d", "Дизайн"], ["pr", "PR и проекты"], ["a", "Автоматизация"]] },
         { key: "title", label: "название", type: "t2" }, { key: "year", label: "год", type: "text" },
         { key: "tags", label: "метки", type: "text", ph: "[PR] [А]" }, { key: "concept", label: "концепт, не внедрён", type: "bool" },
         { key: "line", label: "подпись в карточке", type: "t2", wide: true, hint: "до 100 знаков" },
@@ -58,7 +58,7 @@ window.SCHEMAS = (function () {
         fields: [{ key: "years", label: "годы, например 2025–2026", type: "text" }, { key: "url", label: "ссылка на видео (файл .mp4 из R2, YouTube или Vimeo)", type: "url" }, { key: "poster", label: "картинка до запуска (необязательно)", type: "url" }, { key: "caption", label: "подпись", type: "t2", wide: true }] },
       { key: "works", label: "работы", type: "list", addLabel: "работа", blank: { id: "", kind: "анимация", title: "", year: "", role: "", client: "", ph: "4:3", line: "" },
         title: function (w) { return (window.ED.plain(w.title) || "без названия") + "  ·  " + window.ED.plain(w.kind) + (w.id ? "  ·  /" + w.id : ""); },
-        fields: [{ key: "id", label: "адрес (латиница, цифры, дефис)", type: "text" }, { key: "kind", label: "вид", type: "t2", hint: "анимация, иллюстрация или штуки" },
+        fields: [{ key: "id", label: "адрес (латиница, цифры, дефис)", type: "text" }, { key: "kind", label: "вид", type: "t2", hint: "анимация, иллюстрация или объекты" },
           { key: "title", label: "название", type: "t2" }, { key: "year", label: "год", type: "text" }, { key: "role", label: "роль", type: "t2" }, { key: "client", label: "для кого", type: "t2" },
           { key: "line", label: "одна строка о сути", type: "t2", wide: true }, { key: "text", label: "текст на странице работы", type: "t2a" },
           { key: "ph", label: "пропорция", type: "text", ph: "4:5" }, { key: "cover", label: "обложка", type: "text", ph: "/assets/img/strangejell/work-1/01" }, IMG] },

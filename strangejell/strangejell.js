@@ -16,7 +16,7 @@
   r.setProperty("--ln", mix(ink, 12, "transparent")); r.setProperty("--ln2", mix(ink, 24, "transparent"));
   r.setProperty("--ph", mix(pal.fg, 9, "transparent")); r.setProperty("--g-a", pal.grain == null ? .2 : pal.grain);
 
-  /* направления: [А] анимация, [И] иллюстрация, [Ш] штуки */
+  /* направления: [А] анимация, [И] иллюстрация, [О] объекты */
   var K = L.kinds || [];
   function kx(k) { return K.filter(function (y) { return y.k === V.pick(k); })[0]; }
   function kname(x) { return V.lang === "en" && x.en ? x.en : x.k; }

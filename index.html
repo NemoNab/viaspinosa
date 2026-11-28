@@ -177,7 +177,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
       </div>
       <div class="real" data-k="n.city">Екатеринбург → Алматы</div>
       <p class="desc" data-k="n.desc">Пиар, картинки и маленькие системы для культурных проектов. Шесть лет в независимом книжном: от торгового зала до PR-директора.</p>
-      <div class="tags" data-k="n.tags">[PR] пиар и партнёрства · [Д] дизайн · [Ш] автоматизация и другие штуки</div>
+      <div class="tags" data-k="n.tags">[PR] пиар и партнёрства · [Д] дизайн · [А] автоматизация</div>
       <div class="links" data-links="n"><a href="https://t.me/nemonab">написать ↗</a><a href="https://t.me/spottedword">канал ↗</a><span>раздел — скоро</span></div>
     </div>
     <div class="bar bottom"><button type="button" class="back" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button></div>
@@ -191,7 +191,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
       </div>
       <div class="real" data-k="l.city">Екатеринбург → Алматы</div>
       <p class="desc" data-k="l.desc">2D-аниматор, арт-директор и художница. Рисует, лепит, режет гравюры и оживляет это на экране.</p>
-      <div class="tags" data-k="l.tags">[А] анимация · [И] иллюстрация · [Ш] штуки</div>
+      <div class="tags" data-k="l.tags">[А] анимация · [И] иллюстрация · [О] объекты</div>
       <div class="links" data-links="l"><a href="https://t.me/strangejell_stuff">канал ↗</a><span>раздел — скоро</span></div>
     </div>
     <div class="bar bottom"><button type="button" class="back only-m" title="Вернуться к первому экрану"><b>viaspinosa.art</b> ↺</button><span data-lang-slot>RU</span></div>
@@ -206,7 +206,7 @@ if (!window.PALETTES.length) window.PALETTES = [{ name: "ночь", by: "n", bg:
   function nb(t) { t = String(t || "").replace(/ (—|–)/g, "\u00a0$1").replace(/\] /g, "]\u00a0"); var p; do { p = t; t = t.replace(SHORT, "$1$2\u00a0"); } while (p !== t); return t; }
   function safe(u) { return typeof u === "string" && /^(https?:|mailto:|tg:)/i.test(u); }
   /* английская версия: поля people.n.en.desc и так далее; если их нет, остаётся русский */
-  var EN = { n: { name: "Sergey Potapov", city: "Yekaterinburg → Almaty", tags: "[PR] PR and partnerships · [D] design · [T] automation and other tools" }, l: { name: "Liza Konysheva", city: "Yekaterinburg → Almaty", tags: "[A] animation · [I] illustration · [T] things" } };
+  var EN = { n: { name: "Sergey Potapov", city: "Yekaterinburg → Almaty", tags: "[PR] PR and partnerships · [D] design · [A] automation" }, l: { name: "Liza Konysheva", city: "Yekaterinburg → Almaty", tags: "[A] animation · [I] illustration · [O] objects" } };
   function get(path) {
     var k = path.split("."), p = S.people && S.people[k[0]];
     if (!p) return null;

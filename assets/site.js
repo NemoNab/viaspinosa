@@ -27,7 +27,7 @@
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   /* текст для вывода: язык + типографика + заглушки [в скобках] подчёркнуты пунктиром.
-     Метки направлений вроде [PR] [Д] [Ш] [А] [И] остаются как есть. */
+     Метки направлений вроде [PR] [Д] [А] [И] [О] остаются как есть. */
   function tx(v) {
     return esc(nb(pick(v))).replace(/\[([^\]]*)\]/g, function (m, x) {
       return /^(PR|Д|А|Т|Ш|И|О|A|I|T|D)$/.test(x) ? m : '<span class="ph-t">' + x + '</span>';
@@ -60,11 +60,11 @@
     "образование": "education", "опыт": "experience", "выставки и фестивали": "exhibitions and festivals", "программы и техники": "software and techniques",
     "кейсы": "cases", "навыки": "skills", "задача": "task", "что сделал": "what I did", "результат": "result", "моё": "mine", "не моё": "not mine",
     "обновлено": "updated", "скачать pdf ↓": "download pdf ↓", "такого проекта нет": "no such project", "демо": "demo",
-    "Дизайн": "Design", "PR и проекты": "PR and projects", "Штуки": "Tools", "операционка и автоматизация": "operations and automation",
+    "Дизайн": "Design", "PR и проекты": "PR and projects", "Автоматизация": "Automation", "операционка и автоматизация": "operations and automation",
     "пиар и проекты": "PR and projects", "раздел →": "section →", "раздел — скоро": "section — soon", "назад": "back"
   };
   /* имена и город по-английски, пока нет своих текстов */
-  var EN_PEOPLE = { n: { name: "Sergey Potapov", city: "Yekaterinburg → Almaty", tags: "[PR] PR and partnerships · [D] design · [T] automation and other tools" }, l: { name: "Liza Konysheva", city: "Yekaterinburg → Almaty", tags: "[A] animation · [I] illustration · [T] things" } };
+  var EN_PEOPLE = { n: { name: "Sergey Potapov", city: "Yekaterinburg → Almaty", tags: "[PR] PR and partnerships · [D] design · [A] automation" }, l: { name: "Liza Konysheva", city: "Yekaterinburg → Almaty", tags: "[A] animation · [I] illustration · [O] objects" } };
   function person(S, k) {
     var p = (S && S.people && S.people[k]) || {}, o = {};
     for (var f in p) o[f] = p[f];
